@@ -105,7 +105,7 @@ export function HomePage() {
     .filter((p) => p.storePrices.some((sp) => sp.isOnSale));
 
   return (
-    <div className="min-h-screen bg-[#fbfbfd]">
+    <div className="min-h-screen bg-[#fbfbfd] dark:bg-black">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {/* Hero Section - Colorful but Clean */}
@@ -223,7 +223,7 @@ export function HomePage() {
       )}
 
       {/* Category Pills */}
-      <section className={`sticky top-14 z-40 bg-white/95 backdrop-blur-xl border-b border-[#d2d2d7]/50 shadow-sm ${searchQuery || selectedCategory ? 'pt-14' : ''}`}>
+      <section className={`sticky top-14 z-40 bg-white/95 dark:bg-[#1d1d1f]/95 backdrop-blur-xl border-b border-[#d2d2d7]/50 dark:border-[#38383a]/50 shadow-sm ${searchQuery || selectedCategory ? 'pt-14' : ''}`}>
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex gap-2 py-4 overflow-x-auto scrollbar-hide">
             <motion.button
@@ -233,7 +233,7 @@ export function HomePage() {
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 selectedCategory === null
                   ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-green-500/25'
-                  : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
+                  : 'bg-[#f5f5f7] dark:bg-[#2c2c2e] text-[#1d1d1f] dark:text-white hover:bg-[#e8e8ed] dark:hover:bg-[#3a3a3c]'
               }`}
             >
               Alle
@@ -247,7 +247,7 @@ export function HomePage() {
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   selectedCategory === category.name
                     ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-green-500/25'
-                    : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
+                    : 'bg-[#f5f5f7] dark:bg-[#2c2c2e] text-[#1d1d1f] dark:text-white hover:bg-[#e8e8ed] dark:hover:bg-[#3a3a3c]'
                 }`}
               >
                 <span className="mr-1.5">{category.icon}</span>
@@ -273,7 +273,7 @@ export function HomePage() {
                 <span className="text-2xl">💰</span>
               </div>
               <div>
-                <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight">
+                <h2 className="text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
                   Største besparelser
                 </h2>
                 <p className="text-[#86868b]">
@@ -309,14 +309,14 @@ export function HomePage() {
               whileInView="visible"
               viewport={{ once: true, margin: '-100px' }}
               variants={fadeInUp}
-              className="rounded-3xl bg-gradient-to-br from-rose-50 to-orange-50 p-8 md:p-10 border border-rose-100"
+              className="rounded-3xl bg-gradient-to-br from-rose-50 to-orange-50 dark:from-rose-950/30 dark:to-orange-950/30 p-8 md:p-10 border border-rose-100 dark:border-rose-900/30"
             >
               <div className="flex items-center gap-4 mb-10">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center shadow-lg shadow-rose-500/25">
                   <span className="text-2xl">🏷️</span>
                 </div>
                 <div>
-                  <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight">
+                  <h2 className="text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight">
                     Aktuelle tilbud
                   </h2>
                   <p className="text-[#86868b]">
@@ -355,7 +355,7 @@ export function HomePage() {
             className="flex items-end justify-between mb-10"
           >
             <div>
-              <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight mb-1">
+              <h2 className="text-3xl font-semibold text-[#1d1d1f] dark:text-white tracking-tight mb-1">
                 {searchQuery
                   ? `Resultater for "${searchQuery}"`
                   : selectedCategory
@@ -372,7 +372,7 @@ export function HomePage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="appearance-none bg-[#f5f5f7] hover:bg-[#e8e8ed] rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-green-500/30 cursor-pointer transition-colors"
+                className="appearance-none bg-[#f5f5f7] dark:bg-[#2c2c2e] hover:bg-[#e8e8ed] dark:hover:bg-[#3a3a3c] rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-[#1d1d1f] dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500/30 cursor-pointer transition-colors"
               >
                 <option value="default">Sortering</option>
                 <option value="price-low">Pris: Lav-Høj</option>
@@ -407,7 +407,7 @@ export function HomePage() {
               animate={{ opacity: 1 }}
               className="text-center py-24"
             >
-              <p className="text-2xl font-semibold text-[#1d1d1f] mb-2">
+              <p className="text-2xl font-semibold text-[#1d1d1f] dark:text-white mb-2">
                 Ingen resultater
               </p>
               <p className="text-[#86868b]">

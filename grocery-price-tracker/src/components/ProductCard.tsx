@@ -26,10 +26,10 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
   return (
     <article
       onClick={onClick}
-      className="group cursor-pointer bg-white rounded-3xl border border-[#e8e8ed] transition-all duration-300 hover:shadow-2xl hover:shadow-black/8 hover:-translate-y-2 hover:border-transparent overflow-hidden"
+      className="group cursor-pointer bg-white dark:bg-[#1d1d1f] rounded-3xl border border-[#e8e8ed] dark:border-[#38383a] transition-all duration-300 hover:shadow-2xl hover:shadow-black/8 dark:hover:shadow-black/30 hover:-translate-y-2 hover:border-transparent overflow-hidden"
     >
       {/* Image Container */}
-      <div className="relative aspect-square bg-gradient-to-br from-[#fafafa] to-[#f0f0f2] p-8 overflow-hidden">
+      <div className="relative aspect-square bg-gradient-to-br from-[#fafafa] to-[#f0f0f2] dark:from-[#2c2c2e] dark:to-[#1d1d1f] p-8 overflow-hidden">
         {/* Decorative gradient blob */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-br from-emerald-200/30 to-teal-200/30 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -46,7 +46,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           className={`absolute top-3 left-3 z-20 p-2 rounded-full transition-all duration-200 ${
             isFavorite
               ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30 scale-100'
-              : 'bg-white/80 backdrop-blur-sm text-[#86868b] opacity-0 group-hover:opacity-100 hover:bg-white hover:text-rose-500 hover:scale-110'
+              : 'bg-white/80 dark:bg-[#2c2c2e]/80 backdrop-blur-sm text-[#86868b] opacity-0 group-hover:opacity-100 hover:bg-white dark:hover:bg-[#3a3a3c] hover:text-rose-500 hover:scale-110'
           }`}
         >
           <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
@@ -86,16 +86,16 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
         </p>
 
         {/* Product Name */}
-        <h3 className="text-base font-semibold text-[#1d1d1f] leading-snug mb-4 line-clamp-2 min-h-[44px] group-hover:text-emerald-600 transition-colors">
+        <h3 className="text-base font-semibold text-[#1d1d1f] dark:text-white leading-snug mb-4 line-clamp-2 min-h-[44px] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
           {product.name}
         </h3>
 
         {/* Price Display */}
         <div className="flex items-end justify-between mb-4">
           <div>
-            <p className="text-[10px] font-medium text-emerald-600 mb-0.5">Bedste pris</p>
+            <p className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 mb-0.5">Bedste pris</p>
             <div className="flex items-baseline gap-0.5">
-              <span className="text-3xl font-bold text-[#1d1d1f] tracking-tight">
+              <span className="text-3xl font-bold text-[#1d1d1f] dark:text-white tracking-tight">
                 {lowestStorePrice.currentPrice.toFixed(2).replace('.', ',')}
               </span>
               <span className="text-sm font-medium text-[#86868b]">kr</span>
@@ -122,8 +122,8 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
                 key={sp.store.id}
                 className={`flex-1 py-2 px-1 rounded-xl text-center transition-all relative overflow-hidden ${
                   index === 0
-                    ? 'bg-gradient-to-b from-emerald-50 to-green-50 ring-1 ring-emerald-200'
-                    : 'bg-[#f5f5f7]'
+                    ? 'bg-gradient-to-b from-emerald-50 to-green-50 dark:from-emerald-950/40 dark:to-green-950/40 ring-1 ring-emerald-200 dark:ring-emerald-800'
+                    : 'bg-[#f5f5f7] dark:bg-[#2c2c2e]'
                 }`}
               >
                 {/* Store Color Bar at Top */}
@@ -137,7 +137,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
                 </p>
                 {/* Price */}
                 <p className={`text-[11px] font-bold ${
-                  index === 0 ? 'text-emerald-600' : 'text-[#1d1d1f]'
+                  index === 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#1d1d1f] dark:text-white'
                 }`}>
                   {sp.currentPrice.toFixed(0)},-
                 </p>
