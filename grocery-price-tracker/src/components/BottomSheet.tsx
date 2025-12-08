@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
-import { motion, AnimatePresence, useDragControls, PanInfo } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
 
 interface BottomSheetProps {
   isOpen: boolean;
