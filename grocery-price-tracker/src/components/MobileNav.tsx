@@ -1,22 +1,26 @@
 import { motion } from 'framer-motion';
-import { Home, Search, Heart, ShoppingCart, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Home, Search, ChefHat, ShoppingCart, User } from 'lucide-react';
 import { useShoppingList } from '../context/ShoppingListContext';
+import { useAuth } from '../context/AuthContext';
 
 interface MobileNavProps {
   onOpenSearch: () => void;
   onOpenList: () => void;
-  activeTab?: 'home' | 'search' | 'favorites' | 'cart' | 'profile';
+  activeTab?: 'home' | 'search' | 'recipes' | 'cart' | 'profile';
 }
 
 export function MobileNav({ onOpenSearch, onOpenList, activeTab = 'home' }: MobileNavProps) {
+  const navigate = useNavigate();
   const { itemCount } = useShoppingList();
+  const { isAuthenticated } = useAuth();
 
   const navItems = [
-    { id: 'home', icon: Home, label: 'Hjem', action: () => window.scrollTo({ top: 0, behavior: 'smooth' }) },
+    { id: 'home', icon: Home, label: 'Hjem', action: () => navigate('/') },
     { id: 'search', icon: Search, label: 'Søg', action: onOpenSearch },
-    { id: 'favorites', icon: Heart, label: 'Favoritter', action: () => {} },
+    { id: 'recipes', icon: ChefHat, label: 'Opskrifter', action: () => navigate('/recipes') },
     { id: 'cart', icon: ShoppingCart, label: 'Liste', action: onOpenList, badge: itemCount },
-    { id: 'profile', icon: User, label: 'Profil', action: () => {} },
+    { id: 'profile', icon: User, label: isAuthenticated ? 'Profil' : 'Log ind', action: () => navigate('/login') },
   ];
 
   return (

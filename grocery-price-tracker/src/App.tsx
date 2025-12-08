@@ -1,6 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { HomePage, ProductDetailPage } from './pages';
+import { HomePage, ProductDetailPage, LoginPage, RecipesPage, RecipeDetailPage } from './pages';
 import { PageTransition } from './components';
 
 function App() {
@@ -22,6 +22,30 @@ function App() {
           element={
             <PageTransition>
               <ProductDetailPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PageTransition>
+              <LoginPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/recipes"
+          element={
+            <PageTransition>
+              <RecipesPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/recipe/:id"
+          element={
+            <PageTransition>
+              <RecipeDetailPage />
             </PageTransition>
           }
         />

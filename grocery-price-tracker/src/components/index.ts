@@ -21,3 +21,4 @@ export { ScrollProgress, CircularScrollProgress } from './ScrollProgress';
 export { BlurImage, ProgressiveImage } from './BlurImage';
 export { GradientText, RevealText, TypewriterText } from './GradientText';
 export { SegmentedControl, PillSelector } from './SegmentedControl';
+export { RecipeCard } from './RecipeCard';
