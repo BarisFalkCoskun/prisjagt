@@ -1,13 +1,16 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, TrendingDown, Percent } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { Header, ProductCard } from '../components';
 import { products, categories, searchProducts } from '../data/products';
+
+type SortOption = 'default' | 'price-low' | 'price-high' | 'savings' | 'name';
 
 export function HomePage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>('default');
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -20,12 +23,35 @@ export function HomePage() {
       result = result.filter((p) => p.category === selectedCategory);
     }
 
-    return result;
-  }, [searchQuery, selectedCategory]);
+    switch (sortBy) {
+      case 'price-low':
+        result = [...result].sort((a, b) => {
+          const aMin = Math.min(...a.storePrices.map(sp => sp.currentPrice));
+          const bMin = Math.min(...b.storePrices.map(sp => sp.currentPrice));
+          return aMin - bMin;
+        });
+        break;
+      case 'price-high':
+        result = [...result].sort((a, b) => {
+          const aMin = Math.min(...a.storePrices.map(sp => sp.currentPrice));
+          const bMin = Math.min(...b.storePrices.map(sp => sp.currentPrice));
+          return bMin - aMin;
+        });
+        break;
+      case 'savings':
+        result = [...result].sort((a, b) => {
+          const aSavings = Math.max(...a.storePrices.map(sp => sp.currentPrice)) - Math.min(...a.storePrices.map(sp => sp.currentPrice));
+          const bSavings = Math.max(...b.storePrices.map(sp => sp.currentPrice)) - Math.min(...b.storePrices.map(sp => sp.currentPrice));
+          return bSavings - aSavings;
+        });
+        break;
+      case 'name':
+        result = [...result].sort((a, b) => a.name.localeCompare(b.name, 'da'));
+        break;
+    }
 
-  const productsOnSale = products.filter((p) =>
-    p.storePrices.some((sp) => sp.isOnSale)
-  );
+    return result;
+  }, [searchQuery, selectedCategory, sortBy]);
 
   const topSavings = [...products]
     .map((p) => {
@@ -36,88 +62,68 @@ export function HomePage() {
     .sort((a, b) => b.savings - a.savings)
     .slice(0, 4);
 
+  const topSavingsIds = new Set(topSavings.map(p => p.id));
+
+  const productsOnSale = products
+    .filter((p) => !topSavingsIds.has(p.id))
+    .filter((p) => p.storePrices.some((sp) => sp.isOnSale));
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-[#fbfbfd]">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      {/* Hero Section */}
+      {/* Hero Section - Apple Style */}
       {!searchQuery && !selectedCategory && (
-        <section className="pt-16">
-          <div className="max-w-6xl mx-auto px-6 py-12">
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 p-10 md:p-16 shadow-2xl shadow-green-500/25">
-              {/* Background Pattern */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute top-10 left-10 w-40 h-40 bg-white rounded-full blur-3xl"></div>
-                <div className="absolute bottom-10 right-10 w-60 h-60 bg-white rounded-full blur-3xl"></div>
-              </div>
+        <section className="pt-20 pb-8">
+          <div className="max-w-5xl mx-auto px-6 text-center">
+            <h1 className="text-5xl md:text-7xl font-semibold text-[#1d1d1f] tracking-tight leading-[1.05] mb-6">
+              Find de bedste priser.
+              <br />
+              <span className="bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+                Spar penge hver dag.
+              </span>
+            </h1>
+            <p className="text-xl md:text-2xl text-[#86868b] max-w-2xl mx-auto leading-relaxed mb-8">
+              Sammenlign priser fra Netto, Rema 1000, Bilka og Fotex.
+              Se prishistorik og find de bedste tilbud.
+            </p>
 
-              <div className="relative z-10">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-white/20 rounded-full backdrop-blur-sm">
-                    <Sparkles className="w-4 h-4 text-yellow-300" />
-                    <span className="text-sm font-medium text-white">
-                      Smart prissammenligning
-                    </span>
-                  </div>
-                </div>
-
-                <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-                  Find de bedste priser
-                  <br />
-                  <span className="text-green-200">pa dagligvarer</span>
-                </h1>
-
-                <p className="text-xl text-green-100 max-w-xl mb-10">
-                  Sammenlign priser fra Netto, Rema 1000, Bilka og Fotex.
-                  Se prishistorik og find de bedste tilbud.
-                </p>
-
-                {/* Stats */}
-                <div className="grid grid-cols-3 gap-4 max-w-md">
-                  <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 text-center border border-white/20">
-                    <p className="text-3xl font-bold text-white">{products.length}</p>
-                    <p className="text-sm text-green-200">Produkter</p>
-                  </div>
-                  <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 text-center border border-white/20">
-                    <p className="text-3xl font-bold text-white">4</p>
-                    <p className="text-sm text-green-200">Butikker</p>
-                  </div>
-                  <div className="bg-white/15 backdrop-blur-sm rounded-2xl p-4 text-center border border-white/20">
-                    <p className="text-3xl font-bold text-yellow-300">{productsOnSale.length}</p>
-                    <p className="text-sm text-green-200">Tilbud</p>
-                  </div>
-                </div>
-              </div>
+            {/* Subtle Stats */}
+            <div className="flex items-center justify-center gap-8 text-sm text-[#86868b]">
+              <span><strong className="text-[#1d1d1f]">{products.length}</strong> produkter</span>
+              <span className="w-1 h-1 rounded-full bg-[#d2d2d7]"></span>
+              <span><strong className="text-[#1d1d1f]">4</strong> butikker</span>
+              <span className="w-1 h-1 rounded-full bg-[#d2d2d7]"></span>
+              <span><strong className="text-emerald-600">{productsOnSale.length + topSavings.length}</strong> tilbud</span>
             </div>
           </div>
         </section>
       )}
 
       {/* Category Pills */}
-      <section className={`sticky top-12 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 ${searchQuery || selectedCategory ? 'pt-16' : ''}`}>
-        <div className="max-w-6xl mx-auto px-6">
+      <section className={`sticky top-14 z-40 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-[#d2d2d7]/30 ${searchQuery || selectedCategory ? 'pt-20' : ''}`}>
+        <div className="max-w-5xl mx-auto px-6">
           <div className="flex gap-2 py-4 overflow-x-auto scrollbar-hide">
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+              className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 selectedCategory === null
-                  ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/25'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'bg-[#1d1d1f] text-white'
+                  : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
               }`}
             >
-              Alle produkter
+              Alle
             </button>
             {categories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(category.name)}
-                className={`flex-shrink-0 px-5 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   selectedCategory === category.name
-                    ? 'bg-gray-900 text-white shadow-lg shadow-gray-900/25'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'bg-[#1d1d1f] text-white'
+                    : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
                 }`}
               >
-                <span className="mr-2">{category.icon}</span>
                 {category.name}
               </button>
             ))}
@@ -125,36 +131,26 @@ export function HomePage() {
         </div>
       </section>
 
-      <main className="max-w-6xl mx-auto px-6 pb-20">
+      <main className="max-w-5xl mx-auto px-6 pb-24">
         {/* Top Savings Section */}
         {!searchQuery && !selectedCategory && (
-          <section className="py-12">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/25">
-                <TrendingDown className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Storste prisforskelle
-                </h2>
-                <p className="text-gray-500">
-                  Her kan du spare mest ved at vaelge den rigtige butik
-                </p>
-              </div>
+          <section className="py-16">
+            <div className="mb-10">
+              <h2 className="text-3xl md:text-4xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
+                Storste besparelser
+              </h2>
+              <p className="text-lg text-[#86868b]">
+                Her kan du spare mest ved at vaelge den rigtige butik.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {topSavings.map((product, index) => (
-                <div
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {topSavings.map((product) => (
+                <ProductCard
                   key={product.id}
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <ProductCard
-                    product={product}
-                    onClick={() => navigate(`/product/${product.id}`)}
-                  />
-                </div>
+                  product={product}
+                  onClick={() => navigate(`/product/${product.id}`)}
+                />
               ))}
             </div>
           </section>
@@ -162,100 +158,90 @@ export function HomePage() {
 
         {/* On Sale Section */}
         {!searchQuery && !selectedCategory && productsOnSale.length > 0 && (
-          <section className="py-12 border-t border-gray-200">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-red-500 to-pink-600 shadow-lg shadow-red-500/25">
-                <Percent className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Aktuelle tilbud
-                </h2>
-                <p className="text-gray-500">
-                  Produkter pa tilbud lige nu
-                </p>
-              </div>
+          <section className="py-16 border-t border-[#d2d2d7]/30">
+            <div className="mb-10">
+              <h2 className="text-3xl md:text-4xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
+                Aktuelle tilbud
+              </h2>
+              <p className="text-lg text-[#86868b]">
+                Produkter pa tilbud lige nu.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {productsOnSale.slice(0, 4).map((product, index) => (
-                <div
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {productsOnSale.slice(0, 4).map((product) => (
+                <ProductCard
                   key={product.id}
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <ProductCard
-                    product={product}
-                    onClick={() => navigate(`/product/${product.id}`)}
-                  />
-                </div>
+                  product={product}
+                  onClick={() => navigate(`/product/${product.id}`)}
+                />
               ))}
             </div>
           </section>
         )}
 
         {/* All Products */}
-        <section className="py-12 border-t border-gray-200">
-          <div className="flex items-center justify-between mb-8">
+        <section className={`py-16 ${!searchQuery && !selectedCategory ? 'border-t border-[#d2d2d7]/30' : ''}`}>
+          <div className="flex items-end justify-between mb-10">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-3xl md:text-4xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
                 {searchQuery
-                  ? `Sogeresultater for "${searchQuery}"`
+                  ? `Resultater for "${searchQuery}"`
                   : selectedCategory
                   ? selectedCategory
                   : 'Alle produkter'}
               </h2>
-              <p className="text-gray-500">
-                {filteredProducts.length} produkter fundet
+              <p className="text-lg text-[#86868b]">
+                {filteredProducts.length} produkter
               </p>
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortOption)}
+                className="appearance-none bg-[#f5f5f7] hover:bg-[#e8e8ed] rounded-lg px-4 py-2 pr-9 text-sm font-medium text-[#1d1d1f] focus:outline-none cursor-pointer transition-colors"
+              >
+                <option value="default">Sortering</option>
+                <option value="price-low">Pris: Lav-Hoj</option>
+                <option value="price-high">Pris: Hoj-Lav</option>
+                <option value="savings">Besparelse</option>
+                <option value="name">Navn</option>
+              </select>
+              <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
             </div>
           </div>
 
           {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filteredProducts.map((product, index) => (
-                <div
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {filteredProducts.map((product) => (
+                <ProductCard
                   key={product.id}
-                  className="animate-fade-in-up"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <ProductCard
-                    product={product}
-                    onClick={() => navigate(`/product/${product.id}`)}
-                  />
-                </div>
+                  product={product}
+                  onClick={() => navigate(`/product/${product.id}`)}
+                />
               ))}
             </div>
           ) : (
-            <div className="text-center py-20">
-              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
-                <TrendingDown className="w-10 h-10 text-gray-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Ingen produkter fundet
-              </h3>
-              <p className="text-gray-500">
-                Prov at soge efter noget andet eller fjern filteret
+            <div className="text-center py-24">
+              <p className="text-2xl font-semibold text-[#1d1d1f] mb-2">
+                Ingen resultater
+              </p>
+              <p className="text-[#86868b]">
+                Prov en anden sogning eller fjern filteret.
               </p>
             </div>
           )}
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/25">
-                <TrendingDown className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-gray-900">PrisJagt</span>
-            </div>
-            <p className="text-sm text-gray-500">
-              Priserne opdateres dagligt. Alle priser er vejledende.
-            </p>
-          </div>
+      {/* Footer - Apple Style */}
+      <footer className="border-t border-[#d2d2d7]/30 bg-[#f5f5f7]">
+        <div className="max-w-5xl mx-auto px-6 py-6">
+          <p className="text-xs text-[#86868b] text-center">
+            Priserne opdateres dagligt. Alle priser er vejledende.
+          </p>
         </div>
       </footer>
     </div>

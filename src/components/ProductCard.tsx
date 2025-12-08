@@ -1,5 +1,4 @@
 import { Image } from '@heroui/react';
-import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import type { Product } from '../types';
 
 interface ProductCardProps {
@@ -19,16 +18,13 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
   const priceDiff = highestStorePrice.currentPrice - lowestStorePrice.currentPrice;
   const hasSale = product.storePrices.some(sp => sp.isOnSale);
 
-  // Mock trend
-  const trend = Math.random() > 0.5 ? 'down' : Math.random() > 0.5 ? 'up' : 'stable';
-
   return (
     <article
       onClick={onClick}
-      className="group cursor-pointer bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.02] overflow-hidden"
+      className="group cursor-pointer bg-white rounded-2xl transition-all duration-300 hover:shadow-lg hover:shadow-black/5 hover:-translate-y-1"
     >
       {/* Image Container */}
-      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+      <div className="relative aspect-square bg-[#f5f5f7] rounded-t-2xl p-6 overflow-hidden">
         <Image
           alt={product.name}
           src={product.image}
@@ -36,94 +32,70 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           fallbackSrc="https://via.placeholder.com/400x400?text=No+Image"
         />
 
-        {/* Top badges row - Sale on left, Trend on right */}
-        <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
-          {/* Sale Badge */}
-          {hasSale ? (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500 text-white shadow-lg">
-              TILBUD
+        {/* Sale Badge - Minimal */}
+        {hasSale && (
+          <div className="absolute top-3 left-3">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#ff3b30] text-white">
+              Tilbud
             </span>
-          ) : (
-            <span></span>
-          )}
-
-          {/* Trend Badge */}
-          <div className={`flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium ${
-            trend === 'down' ? 'bg-green-100 text-green-700' :
-            trend === 'up' ? 'bg-red-100 text-red-700' :
-            'bg-gray-100 text-gray-600'
-          }`}>
-            {trend === 'down' && <TrendingDown className="w-3 h-3" />}
-            {trend === 'up' && <TrendingUp className="w-3 h-3" />}
-            {trend === 'stable' && <Minus className="w-3 h-3" />}
-            {trend === 'down' && 'Faldende'}
-            {trend === 'up' && 'Stigende'}
-            {trend === 'stable' && 'Stabil'}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Content */}
       <div className="p-4">
         {/* Category */}
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+        <p className="text-[11px] font-medium text-[#86868b] uppercase tracking-wider mb-1">
           {product.category}
         </p>
 
         {/* Product Name */}
-        <h3 className="text-base font-semibold text-gray-900 leading-tight mb-3 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-[15px] font-semibold text-[#1d1d1f] leading-snug mb-3 line-clamp-2 min-h-[40px]">
           {product.name}
         </h3>
 
-        {/* Price */}
-        <div className="flex items-end justify-between mb-3">
+        {/* Price Row */}
+        <div className="flex items-end justify-between mb-4">
           <div>
-            <p className="text-xs text-gray-500 mb-0.5">Fra</p>
-            <div className="flex items-baseline gap-1">
-              <span className="text-2xl font-bold text-gray-900">
+            <p className="text-[11px] text-[#86868b] mb-0.5">fra</p>
+            <div className="flex items-baseline gap-0.5">
+              <span className="text-2xl font-semibold text-[#1d1d1f] tracking-tight">
                 {lowestStorePrice.currentPrice.toFixed(2).replace('.', ',')}
               </span>
-              <span className="text-sm text-gray-500">kr</span>
+              <span className="text-sm text-[#86868b]">kr</span>
             </div>
-            <p className="text-xs text-gray-400 mt-0.5">
-              {lowestStorePrice.store.name}
-            </p>
           </div>
 
-          {/* Savings */}
-          {priceDiff > 0 && (
+          {/* Savings Badge */}
+          {priceDiff > 1 && (
             <div className="text-right">
-              <div className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-green-50 border border-green-100">
-                <span className="text-sm font-bold text-green-600">
-                  Spar {priceDiff.toFixed(2).replace('.', ',')} kr
-                </span>
-              </div>
+              <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-[#34c759]/10 text-[#34c759]">
+                Spar {priceDiff.toFixed(0)} kr
+              </span>
             </div>
           )}
         </div>
 
-        {/* Store Price Pills */}
-        <div className="grid grid-cols-4 gap-1.5">
+        {/* Store Prices - Clean Grid */}
+        <div className="grid grid-cols-4 gap-1">
           {product.storePrices
             .sort((a, b) => a.currentPrice - b.currentPrice)
-            .slice(0, 4)
             .map((sp, index) => (
               <div
                 key={sp.store.id}
-                className={`py-2 px-1 rounded-xl text-center transition-all ${
-                  index === 0 ? 'ring-2 ring-green-400/50 bg-green-50' : 'bg-gray-50'
+                className={`relative py-2 px-1 rounded-lg text-center ${
+                  index === 0 ? 'bg-[#34c759]/8' : 'bg-[#f5f5f7]'
                 }`}
               >
+                {/* Store Color Indicator */}
                 <div
-                  className="w-full h-1 rounded-full mb-1.5"
+                  className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full"
                   style={{ backgroundColor: sp.store.color }}
                 />
-                <p className="text-[9px] font-medium text-gray-500 mb-0.5 truncate">
+                <p className="text-[9px] font-medium text-[#86868b] mt-1 mb-0.5 truncate">
                   {sp.store.name}
                 </p>
-                <p
-                  className={`text-sm font-bold ${index === 0 ? 'text-green-600' : 'text-gray-800'}`}
-                >
+                <p className={`text-xs font-semibold ${index === 0 ? 'text-[#34c759]' : 'text-[#1d1d1f]'}`}>
                   {sp.currentPrice.toFixed(0)},-
                 </p>
               </div>

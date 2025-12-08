@@ -72,8 +72,8 @@ export function PriceChart({ priceHistory }: PriceChartProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white rounded-xl p-4 shadow-xl border border-[#E8E8ED]">
-          <p className="text-xs font-medium text-[#86868B] mb-3">
+        <div className="bg-white rounded-xl p-4 shadow-lg border border-[#d2d2d7]/30">
+          <p className="text-xs font-medium text-[#86868b] mb-3">
             {formatDate(label)}
           </p>
           <div className="space-y-2">
@@ -91,11 +91,11 @@ export function PriceChart({ priceHistory }: PriceChartProps) {
                         className="w-2 h-2 rounded-full"
                         style={{ backgroundColor: store?.color }}
                       />
-                      <span className="text-sm text-[#1D1D1F]">
+                      <span className="text-sm text-[#1d1d1f]">
                         {store?.name}
                       </span>
                     </div>
-                    <span className="text-sm font-semibold text-[#1D1D1F] price-tag">
+                    <span className="text-sm font-semibold text-[#1d1d1f]">
                       {entry.value.toFixed(2).replace('.', ',')} kr
                     </span>
                   </div>
@@ -110,9 +110,9 @@ export function PriceChart({ priceHistory }: PriceChartProps) {
 
   const storeColors: Record<string, string> = {
     netto: '#FFD700',
-    rema1000: '#E31937',
-    bilka: '#0066B3',
-    foetex: '#E31937',
+    rema1000: '#BA0C2F',
+    bilka: '#00A0E3',
+    foetex: '#002855',
   };
 
   return (
@@ -120,15 +120,15 @@ export function PriceChart({ priceHistory }: PriceChartProps) {
       {/* Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         {/* Time Range */}
-        <div className="flex gap-1 p-1 bg-[#F5F5F7] rounded-lg">
+        <div className="flex gap-1 p-1 bg-[#f5f5f7] rounded-lg">
           {(['7d', '30d', '90d'] as TimeRange[]).map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
               className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${
                 timeRange === range
-                  ? 'bg-white text-[#1D1D1F] shadow-sm'
-                  : 'text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-white text-[#1d1d1f] shadow-sm'
+                  : 'text-[#86868b] hover:text-[#1d1d1f]'
               }`}
             >
               {range === '7d' && '7 dage'}
@@ -146,8 +146,8 @@ export function PriceChart({ priceHistory }: PriceChartProps) {
               onClick={() => toggleStore(store.id)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 selectedStores.includes(store.id)
-                  ? 'bg-[#1D1D1F] text-white'
-                  : 'bg-[#F5F5F7] text-[#86868B] hover:text-[#1D1D1F]'
+                  ? 'bg-[#1d1d1f] text-white'
+                  : 'bg-[#f5f5f7] text-[#86868b] hover:text-[#1d1d1f]'
               }`}
             >
               <div
@@ -173,19 +173,19 @@ export function PriceChart({ priceHistory }: PriceChartProps) {
           >
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#E8E8ED"
+              stroke="#e8e8ed"
               vertical={false}
             />
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
-              tick={{ fill: '#86868B', fontSize: 12 }}
-              axisLine={{ stroke: '#E8E8ED' }}
+              tick={{ fill: '#86868b', fontSize: 12 }}
+              axisLine={{ stroke: '#e8e8ed' }}
               tickLine={false}
               interval="preserveStartEnd"
             />
             <YAxis
-              tick={{ fill: '#86868B', fontSize: 12 }}
+              tick={{ fill: '#86868b', fontSize: 12 }}
               axisLine={false}
               tickLine={false}
               tickFormatter={(value) => `${value}`}

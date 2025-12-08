@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Image } from '@heroui/react';
-import { ArrowLeft, Bell, TrendingDown, BarChart3, Tag, Sparkles } from 'lucide-react';
+import { ArrowLeft, Bell } from 'lucide-react';
 import { PriceChart } from '../components';
 import { getProductById } from '../data/products';
 
@@ -11,20 +11,17 @@ export function ProductDetailPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-[#fbfbfd]">
         <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gray-100 flex items-center justify-center">
-            <TrendingDown className="w-10 h-10 text-gray-400" />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <p className="text-2xl font-semibold text-[#1d1d1f] mb-2">
             Produkt ikke fundet
-          </h1>
-          <p className="text-gray-500 mb-6">
+          </p>
+          <p className="text-[#86868b] mb-6">
             Det produkt du leder efter findes ikke.
           </p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl shadow-lg shadow-green-500/25 hover:shadow-xl hover:shadow-green-500/30 transition-all"
+            className="px-5 py-2.5 bg-[#0071e3] text-white text-sm font-medium rounded-full hover:bg-[#0077ed] transition-colors"
           >
             Tilbage til forsiden
           </button>
@@ -40,81 +37,76 @@ export function ProductDetailPage() {
   const savings = sortedStorePrices[sortedStorePrices.length - 1].currentPrice - sortedStorePrices[0].currentPrice;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-[#fbfbfd]">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200/50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex items-center justify-between h-14">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-[#d2d2d7]/30">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="flex items-center justify-between h-12">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors font-medium"
+              className="flex items-center gap-1.5 text-[#0071e3] hover:opacity-70 transition-opacity"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm">Tilbage</span>
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-600 rounded-full hover:bg-amber-100 transition-colors">
+            <button className="flex items-center gap-1.5 text-[#0071e3] hover:opacity-70 transition-opacity">
               <Bell className="w-4 h-4" />
-              <span className="text-sm font-medium">Prisalarm</span>
+              <span className="text-sm">Prisalarm</span>
             </button>
           </div>
         </div>
       </nav>
 
-      <main className="pt-14">
+      <main className="pt-12">
         {/* Hero Section */}
-        <section className="bg-white border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-6 py-12">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <section className="bg-white border-b border-[#d2d2d7]/30">
+          <div className="max-w-5xl mx-auto px-6 py-16">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               {/* Product Image */}
-              <div className="animate-scale-in">
-                <div className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-12 shadow-inner">
-                  <Image
-                    alt={product.name}
-                    src={product.image}
-                    className="object-contain w-full h-full"
-                    fallbackSrc="https://via.placeholder.com/500x500?text=No+Image"
-                  />
-                </div>
+              <div className="aspect-square bg-[#f5f5f7] rounded-3xl p-12">
+                <Image
+                  alt={product.name}
+                  src={product.image}
+                  className="object-contain w-full h-full"
+                  fallbackSrc="https://via.placeholder.com/500x500?text=No+Image"
+                />
               </div>
 
               {/* Product Info */}
-              <div className="animate-fade-in-up">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">{product.category}</p>
-                <h1 className="text-4xl font-bold text-gray-900 leading-tight mb-4">
+              <div>
+                <p className="text-sm font-medium text-[#86868b] uppercase tracking-wider mb-2">
+                  {product.category}
+                </p>
+                <h1 className="text-4xl md:text-5xl font-semibold text-[#1d1d1f] tracking-tight leading-tight mb-4">
                   {product.name}
                 </h1>
-                <p className="text-lg text-gray-600 mb-8">
+                <p className="text-lg text-[#86868b] mb-8 leading-relaxed">
                   {product.description}
                 </p>
 
                 {/* Price Highlight */}
-                <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 mb-6 border border-green-100">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="p-1.5 bg-green-500 rounded-lg">
-                      <Sparkles className="w-4 h-4 text-white" />
-                    </div>
-                    <p className="text-sm font-semibold text-green-700">Bedste pris</p>
-                  </div>
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-5xl font-bold text-green-600">
+                <div className="mb-8">
+                  <p className="text-sm text-[#86868b] mb-1">Bedste pris</p>
+                  <div className="flex items-baseline gap-1 mb-1">
+                    <span className="text-5xl font-semibold text-[#1d1d1f] tracking-tight">
                       {lowestPrice.currentPrice.toFixed(2).replace('.', ',')}
                     </span>
-                    <span className="text-2xl text-green-500">kr</span>
+                    <span className="text-2xl text-[#86868b]">kr</span>
                   </div>
-                  <p className="text-sm text-green-600">
-                    hos <span className="font-semibold">{lowestPrice.store.name}</span>
+                  <p className="text-sm text-[#86868b]">
+                    hos {lowestPrice.store.name}
                   </p>
                 </div>
 
-                {/* CTA Buttons */}
-                <div className="flex gap-4">
+                {/* CTA Button */}
+                <div className="flex gap-3">
                   <button
-                    className="flex-1 px-6 py-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-xl shadow-lg shadow-green-500/25 hover:shadow-xl hover:shadow-green-500/30 hover:scale-[1.02] transition-all"
+                    className="flex-1 px-6 py-3.5 text-white text-base font-medium rounded-xl transition-all hover:opacity-90"
                     style={{ backgroundColor: lowestPrice.store.color }}
                   >
                     Ga til {lowestPrice.store.name}
                   </button>
-                  <button className="px-4 py-4 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 transition-colors border border-amber-200">
+                  <button className="px-4 py-3.5 bg-[#f5f5f7] text-[#1d1d1f] rounded-xl hover:bg-[#e8e8ed] transition-colors">
                     <Bell className="w-5 h-5" />
                   </button>
                 </div>
@@ -124,65 +116,56 @@ export function ProductDetailPage() {
         </section>
 
         {/* Price Comparison */}
-        <section className="border-b border-gray-200">
-          <div className="max-w-6xl mx-auto px-6 py-12">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25">
-                <Tag className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Priser i alle butikker
-                </h2>
-                <p className="text-gray-500">
-                  Sammenlign og find den bedste pris
-                </p>
-              </div>
+        <section className="border-b border-[#d2d2d7]/30">
+          <div className="max-w-5xl mx-auto px-6 py-16">
+            <div className="mb-10">
+              <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
+                Sammenlign priser
+              </h2>
+              <p className="text-lg text-[#86868b]">
+                Se priser i alle butikker.
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               {sortedStorePrices.map((sp, index) => (
                 <div
                   key={sp.store.id}
-                  className={`rounded-2xl p-6 transition-all hover:scale-[1.02] cursor-pointer ${
+                  className={`rounded-2xl p-5 transition-all ${
                     index === 0
-                      ? 'bg-gradient-to-br from-emerald-50 to-green-50 ring-2 ring-green-200 shadow-lg shadow-green-500/10'
-                      : 'bg-white shadow-sm hover:shadow-md'
+                      ? 'bg-[#34c759]/5 ring-1 ring-[#34c759]/20'
+                      : 'bg-[#f5f5f7]'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div
-                      className="px-3 py-1 rounded-full text-xs font-bold text-white"
+                      className="w-3 h-3 rounded-full"
                       style={{ backgroundColor: sp.store.color }}
-                    >
-                      {sp.store.name}
-                    </div>
+                    />
                     {index === 0 && (
-                      <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                      <span className="text-[10px] font-semibold text-[#34c759] uppercase tracking-wider">
                         Billigst
                       </span>
                     )}
-                    {sp.isOnSale && index !== 0 && (
-                      <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">
-                        Tilbud
-                      </span>
-                    )}
                   </div>
-                  <div className="flex items-baseline gap-1">
-                    <span className={`text-3xl font-bold ${
-                      index === 0 ? 'text-green-600' : 'text-gray-900'
+                  <p className="text-sm font-medium text-[#1d1d1f] mb-2">
+                    {sp.store.name}
+                  </p>
+                  <div className="flex items-baseline gap-0.5">
+                    <span className={`text-2xl font-semibold tracking-tight ${
+                      index === 0 ? 'text-[#34c759]' : 'text-[#1d1d1f]'
                     }`}>
                       {sp.currentPrice.toFixed(2).replace('.', ',')}
                     </span>
-                    <span className="text-sm text-gray-500">kr</span>
+                    <span className="text-sm text-[#86868b]">kr</span>
                   </div>
                   {sp.previousPrice && (
-                    <p className="text-sm text-gray-400 line-through mt-1">
+                    <p className="text-xs text-[#86868b] line-through mt-1">
                       {sp.previousPrice.toFixed(2).replace('.', ',')} kr
                     </p>
                   )}
-                  <p className={`text-xs mt-3 font-medium ${sp.inStock ? 'text-green-600' : 'text-red-500'}`}>
-                    {sp.inStock ? '✓ Pa lager' : '✗ Ikke pa lager'}
+                  <p className={`text-[11px] mt-2 ${sp.inStock ? 'text-[#34c759]' : 'text-[#ff3b30]'}`}>
+                    {sp.inStock ? 'Pa lager' : 'Ikke pa lager'}
                   </p>
                 </div>
               ))}
@@ -191,22 +174,17 @@ export function ProductDetailPage() {
         </section>
 
         {/* Price History */}
-        <section className="border-b border-gray-200 bg-white">
-          <div className="max-w-6xl mx-auto px-6 py-12">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/25">
-                <BarChart3 className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Prisudvikling over tid
-                </h2>
-                <p className="text-gray-500">
-                  Se hvordan priserne har udviklet sig
-                </p>
-              </div>
+        <section className="border-b border-[#d2d2d7]/30">
+          <div className="max-w-5xl mx-auto px-6 py-16">
+            <div className="mb-10">
+              <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
+                Prishistorik
+              </h2>
+              <p className="text-lg text-[#86868b]">
+                Se prisudvikling over tid.
+              </p>
             </div>
-            <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-6 border border-[#d2d2d7]/30">
               <PriceChart priceHistory={product.priceHistory} />
             </div>
           </div>
@@ -214,43 +192,38 @@ export function ProductDetailPage() {
 
         {/* Price Stats */}
         <section>
-          <div className="max-w-6xl mx-auto px-6 py-12">
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/25">
-                <TrendingDown className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Prisstatistik
-                </h2>
-                <p className="text-gray-500">
-                  Indsigt i prisudviklingen de seneste 90 dage
-                </p>
-              </div>
+          <div className="max-w-5xl mx-auto px-6 py-16">
+            <div className="mb-10">
+              <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight mb-2">
+                Statistik
+              </h2>
+              <p className="text-lg text-[#86868b]">
+                Indsigt fra de seneste 90 dage.
+              </p>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border border-green-100">
-                <p className="text-sm font-medium text-green-700 mb-2">Laveste (90 dage)</p>
-                <p className="text-3xl font-bold text-green-600">
+              <div className="bg-[#f5f5f7] rounded-2xl p-5">
+                <p className="text-sm text-[#86868b] mb-1">Laveste pris</p>
+                <p className="text-2xl font-semibold text-[#34c759] tracking-tight">
                   {product.lowestPrice.toFixed(2).replace('.', ',')} kr
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-6 border border-red-100">
-                <p className="text-sm font-medium text-red-700 mb-2">Hojeste (90 dage)</p>
-                <p className="text-3xl font-bold text-red-600">
+              <div className="bg-[#f5f5f7] rounded-2xl p-5">
+                <p className="text-sm text-[#86868b] mb-1">Hojeste pris</p>
+                <p className="text-2xl font-semibold text-[#ff3b30] tracking-tight">
                   {product.highestPrice.toFixed(2).replace('.', ',')} kr
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-2xl p-6 border border-gray-200">
-                <p className="text-sm font-medium text-gray-600 mb-2">Gennemsnit</p>
-                <p className="text-3xl font-bold text-gray-900">
+              <div className="bg-[#f5f5f7] rounded-2xl p-5">
+                <p className="text-sm text-[#86868b] mb-1">Gennemsnit</p>
+                <p className="text-2xl font-semibold text-[#1d1d1f] tracking-tight">
                   {product.averagePrice.toFixed(2).replace('.', ',')} kr
                 </p>
               </div>
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
-                <p className="text-sm font-medium text-blue-700 mb-2">Mulig besparelse</p>
-                <p className="text-3xl font-bold text-blue-600">
+              <div className="bg-[#f5f5f7] rounded-2xl p-5">
+                <p className="text-sm text-[#86868b] mb-1">Mulig besparelse</p>
+                <p className="text-2xl font-semibold text-[#0071e3] tracking-tight">
                   {savings.toFixed(2).replace('.', ',')} kr
                 </p>
               </div>
@@ -260,19 +233,11 @@ export function ProductDetailPage() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 flex items-center justify-center shadow-lg shadow-green-500/25">
-                <TrendingDown className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-gray-900">PrisJagt</span>
-            </div>
-            <p className="text-sm text-gray-500">
-              Priserne opdateres dagligt. Alle priser er vejledende.
-            </p>
-          </div>
+      <footer className="border-t border-[#d2d2d7]/30 bg-[#f5f5f7]">
+        <div className="max-w-5xl mx-auto px-6 py-6">
+          <p className="text-xs text-[#86868b] text-center">
+            Priserne opdateres dagligt. Alle priser er vejledende.
+          </p>
         </div>
       </footer>
     </div>
