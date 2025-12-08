@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { Image } from '@heroui/react';
 import {
   ArrowLeft,
@@ -17,11 +17,16 @@ import {
   ChevronRight,
   Check,
   ChefHat,
-  Users
+  Users,
+  Plus,
+  ZoomIn,
+  X
 } from 'lucide-react';
 import { PriceChart } from '../components';
+import { Confetti } from '../components/Confetti';
 import { getProductById, products } from '../data/products';
 import { getRecipesForProduct } from '../data/recipes';
+import { useShoppingList } from '../context';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -68,6 +73,42 @@ export function ProductDetailPage() {
   const product = getProductById(id || '');
   const [isFavorite, setIsFavorite] = useState(false);
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
+  const [showZoom, setShowZoom] = useState(false);
+  const [showStickyBar, setShowStickyBar] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [addedToList, setAddedToList] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  const { addItem, isInList } = useShoppingList();
+
+  // Scroll-based animations
+  const { scrollY } = useScroll();
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const heroScale = useTransform(scrollY, [0, 300], [1, 0.95]);
+
+  // Show sticky bar when scrolling past hero
+  useEffect(() => {
+    const handleScroll = () => {
+      if (heroRef.current) {
+        const heroBottom = heroRef.current.offsetTop + heroRef.current.offsetHeight;
+        setShowStickyBar(window.scrollY > heroBottom - 100);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleAddToList = () => {
+    if (product) {
+      addItem(product);
+      setShowConfetti(true);
+      setAddedToList(true);
+      setTimeout(() => {
+        setShowConfetti(false);
+        setAddedToList(false);
+      }, 2000);
+    }
+  };
 
   if (!product) {
     return (
@@ -102,13 +143,13 @@ export function ProductDetailPage() {
   );
   const lowestPrice = sortedStorePrices[0];
   const savings = sortedStorePrices[sortedStorePrices.length - 1].currentPrice - sortedStorePrices[0].currentPrice;
+  const inList = isInList(product.id);
 
-  // Get related products (same category, different product)
+  // Get related products
   const relatedProducts = products
     .filter(p => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
 
-  // If not enough from same category, fill with other products
   if (relatedProducts.length < 4) {
     const otherProducts = products
       .filter(p => p.id !== product.id && !relatedProducts.includes(p))
@@ -116,16 +157,121 @@ export function ProductDetailPage() {
     relatedProducts.push(...otherProducts);
   }
 
-  // Get recipes for this product
   const recipes = getRecipesForProduct(product.id);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] dark:bg-[#000000]">
+      {/* Confetti */}
+      <Confetti isActive={showConfetti} origin={{ x: 0.5, y: 0.3 }} />
+
+      {/* Image Zoom Modal */}
+      <AnimatePresence>
+        {showZoom && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl flex items-center justify-center p-8"
+            onClick={() => setShowZoom(false)}
+          >
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              className="absolute top-6 right-6 p-3 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+              onClick={() => setShowZoom(false)}
+            >
+              <X className="w-6 h-6" />
+            </motion.button>
+            <motion.img
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25 }}
+              src={product.image}
+              alt={product.name}
+              className="max-w-full max-h-full object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sticky Buy Bar */}
+      <AnimatePresence>
+        {showStickyBar && (
+          <motion.div
+            initial={{ y: -100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -100, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25 }}
+            className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-[#1d1d1f]/95 backdrop-blur-xl border-b border-[#d2d2d7]/30 dark:border-[#38383a]/50 shadow-lg"
+          >
+            <div className="max-w-5xl mx-auto px-6 py-3">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4 min-w-0">
+                  <motion.button
+                    whileHover={{ x: -3 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => navigate('/')}
+                    className="flex-shrink-0 p-2 rounded-full bg-[#f5f5f7] dark:bg-[#2c2c2e] text-[#86868b] hover:bg-[#e8e8ed] dark:hover:bg-[#3a3a3c]"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                  </motion.button>
+                  <div className="min-w-0">
+                    <h2 className="font-semibold text-[#1d1d1f] dark:text-white truncate">{product.name}</h2>
+                    <p className="text-sm text-[#86868b]">
+                      Fra <span className="font-semibold text-emerald-600">{lowestPrice.currentPrice.toFixed(2).replace('.', ',')} kr</span> hos {lowestPrice.store.name}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleAddToList}
+                    disabled={addedToList}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-full font-medium transition-all ${
+                      addedToList || inList
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg shadow-green-500/25'
+                    }`}
+                  >
+                    {addedToList || inList ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span className="hidden sm:inline">Tilføjet</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        <span className="hidden sm:inline">Tilføj til liste</span>
+                      </>
+                    )}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-4 py-2.5 rounded-full font-medium text-white shadow-lg hidden sm:flex items-center gap-2"
+                    style={{ backgroundColor: lowestPrice.store.color }}
+                  >
+                    <span>Gå til butik</span>
+                    <ExternalLink className="w-4 h-4" />
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Navigation */}
       <motion.nav
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#1d1d1f]/80 backdrop-blur-xl border-b border-[#d2d2d7]/30 dark:border-[#38383a]/50"
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+          showStickyBar ? 'opacity-0 pointer-events-none' : 'bg-white/80 dark:bg-[#1d1d1f]/80 backdrop-blur-xl border-b border-[#d2d2d7]/30 dark:border-[#38383a]/50'
+        }`}
       >
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex items-center justify-between h-14">
@@ -174,16 +320,21 @@ export function ProductDetailPage() {
 
       <main className="pt-14">
         {/* Hero Section */}
-        <section className="bg-white dark:bg-[#1d1d1f] border-b border-[#d2d2d7]/30 dark:border-[#38383a]/50">
-          <div className="max-w-5xl mx-auto px-6 py-12 md:py-16">
+        <section ref={heroRef} className="bg-white dark:bg-[#1d1d1f] border-b border-[#d2d2d7]/30 dark:border-[#38383a]/50">
+          <motion.div
+            style={{ opacity: heroOpacity, scale: heroScale }}
+            className="max-w-5xl mx-auto px-6 py-12 md:py-16"
+          >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              {/* Product Image */}
+              {/* Product Image with Zoom */}
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.6 }}
-                className="aspect-square bg-gradient-to-br from-[#f5f5f7] to-[#e8e8ed] dark:from-[#2c2c2e] dark:to-[#1c1c1e] rounded-3xl p-12 relative overflow-hidden group"
+                className="aspect-square bg-gradient-to-br from-[#f5f5f7] to-[#e8e8ed] dark:from-[#2c2c2e] dark:to-[#1c1c1e] rounded-3xl p-12 relative overflow-hidden group cursor-zoom-in"
+                onClick={() => setShowZoom(true)}
               >
+                {/* Animated background blobs */}
                 <motion.div
                   animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
                   transition={{ duration: 10, repeat: Infinity }}
@@ -194,11 +345,21 @@ export function ProductDetailPage() {
                   transition={{ duration: 12, repeat: Infinity }}
                   className="absolute bottom-10 left-10 w-40 h-40 bg-blue-500/10 rounded-full blur-2xl"
                 />
-                <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.3 }}>
+
+                {/* Zoom indicator */}
+                <div className="absolute top-4 right-4 z-20 p-2 rounded-full bg-black/20 text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                  <ZoomIn className="w-5 h-5" />
+                </div>
+
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                  className="relative z-10 h-full"
+                >
                   <Image
                     alt={product.name}
                     src={product.image}
-                    className="object-contain w-full h-full relative z-10"
+                    className="object-contain w-full h-full"
                     fallbackSrc="https://via.placeholder.com/500x500?text=No+Image"
                   />
                 </motion.div>
@@ -245,24 +406,39 @@ export function ProductDetailPage() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="flex-1 flex items-center justify-center gap-2 px-6 py-4 text-white text-base font-semibold rounded-2xl transition-all shadow-lg"
+                    onClick={handleAddToList}
+                    disabled={addedToList}
+                    className={`flex-1 flex items-center justify-center gap-2 px-6 py-4 text-base font-semibold rounded-2xl transition-all shadow-lg ${
+                      addedToList || inList
+                        ? 'bg-emerald-500 text-white shadow-emerald-500/25'
+                        : 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-green-500/25'
+                    }`}
+                  >
+                    {addedToList || inList ? (
+                      <>
+                        <Check className="w-5 h-5" />
+                        <span>Tilføjet til liste</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-5 h-5" />
+                        <span>Tilføj til liste</span>
+                      </>
+                    )}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="flex items-center justify-center gap-2 px-6 py-4 text-white text-base font-semibold rounded-2xl transition-all shadow-lg"
                     style={{ backgroundColor: lowestPrice.store.color, boxShadow: `0 10px 40px -10px ${lowestPrice.store.color}50` }}
                   >
                     <span>Gå til {lowestPrice.store.name}</span>
                     <ExternalLink className="w-4 h-4" />
                   </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setIsFavorite(!isFavorite)}
-                    className={`px-5 py-4 rounded-2xl transition-all shadow-lg ${isFavorite ? 'bg-rose-500 text-white shadow-rose-500/25' : 'bg-[#f5f5f7] dark:bg-[#2c2c2e] text-[#86868b] hover:bg-[#e8e8ed] dark:hover:bg-[#3a3a3c]'}`}
-                  >
-                    <Heart className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
-                  </motion.button>
                 </motion.div>
               </motion.div>
             </div>
-          </div>
+          </motion.div>
         </section>
 
         {/* Store Locations & Prices */}
