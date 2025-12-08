@@ -1,10 +1,46 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { ChevronDown, Sparkles } from 'lucide-react';
 import { Header, ProductCard } from '../components';
 import { products, categories, searchProducts } from '../data/products';
 
 type SortOption = 'default' | 'price-low' | 'price-high' | 'savings' | 'name';
+
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      stiffness: 100,
+      damping: 15
+    }
+  }
+};
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: 'easeOut' }
+  }
+};
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -78,45 +114,109 @@ export function HomePage() {
           <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600">
             {/* Animated background shapes */}
             <div className="absolute inset-0">
-              <div className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-              <div className="absolute bottom-10 right-20 w-80 h-80 bg-teal-400/20 rounded-full blur-3xl"></div>
-              <div className="absolute top-40 right-40 w-64 h-64 bg-emerald-300/20 rounded-full blur-3xl"></div>
+              <motion.div
+                className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  x: [0, 20, 0],
+                  y: [0, -20, 0],
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+              <motion.div
+                className="absolute bottom-10 right-20 w-80 h-80 bg-teal-400/20 rounded-full blur-3xl"
+                animate={{
+                  scale: [1.2, 1, 1.2],
+                  x: [0, -30, 0],
+                  y: [0, 30, 0],
+                }}
+                transition={{
+                  duration: 10,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
+              <motion.div
+                className="absolute top-40 right-40 w-64 h-64 bg-emerald-300/20 rounded-full blur-3xl"
+                animate={{
+                  scale: [1, 1.3, 1],
+                  rotate: [0, 180, 360],
+                }}
+                transition={{
+                  duration: 12,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
             </div>
 
             <div className="relative max-w-5xl mx-auto px-6 py-20 md:py-28">
-              <div className="flex items-center gap-2 mb-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="flex items-center gap-2 mb-6"
+              >
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
                   <Sparkles className="w-4 h-4 text-yellow-300" />
                   <span className="text-sm font-medium text-white">Smart prissammenligning</span>
                 </div>
-              </div>
+              </motion.div>
 
-              <h1 className="text-5xl md:text-7xl font-semibold text-white tracking-tight leading-[1.05] mb-6">
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="text-5xl md:text-7xl font-semibold text-white tracking-tight leading-[1.05] mb-6"
+              >
                 Find de bedste priser.
                 <br />
                 <span className="text-emerald-100">Spar penge hver dag.</span>
-              </h1>
+              </motion.h1>
 
-              <p className="text-xl md:text-2xl text-emerald-50/90 max-w-2xl leading-relaxed mb-10">
-                Sammenlign priser fra Netto, Rema 1000, Bilka og Fotex.
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="text-xl md:text-2xl text-emerald-50/90 max-w-2xl leading-relaxed mb-10"
+              >
+                Sammenlign priser fra Netto, Rema 1000, Bilka og Føtex.
                 Se prishistorik og find de bedste tilbud.
-              </p>
+              </motion.p>
 
               {/* Stats */}
-              <div className="flex flex-wrap gap-6">
-                <div className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20">
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
+                className="flex flex-wrap gap-6"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20"
+                >
                   <span className="text-3xl font-semibold text-white">{products.length}</span>
                   <span className="text-emerald-100">produkter</span>
-                </div>
-                <div className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20">
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20"
+                >
                   <span className="text-3xl font-semibold text-white">4</span>
                   <span className="text-emerald-100">butikker</span>
-                </div>
-                <div className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20">
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20"
+                >
                   <span className="text-3xl font-semibold text-yellow-300">{productsOnSale.length + topSavings.length}</span>
                   <span className="text-emerald-100">tilbud</span>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </div>
           </div>
         </section>
@@ -126,7 +226,9 @@ export function HomePage() {
       <section className={`sticky top-14 z-40 bg-white/95 backdrop-blur-xl border-b border-[#d2d2d7]/50 shadow-sm ${searchQuery || selectedCategory ? 'pt-14' : ''}`}>
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex gap-2 py-4 overflow-x-auto scrollbar-hide">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedCategory(null)}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                 selectedCategory === null
@@ -135,10 +237,12 @@ export function HomePage() {
               }`}
             >
               Alle
-            </button>
+            </motion.button>
             {categories.map((category) => (
-              <button
+              <motion.button
                 key={category.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedCategory(category.name)}
                 className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   selectedCategory === category.name
@@ -148,7 +252,7 @@ export function HomePage() {
               >
                 <span className="mr-1.5">{category.icon}</span>
                 {category.name}
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
@@ -158,36 +262,55 @@ export function HomePage() {
         {/* Top Savings Section */}
         {!searchQuery && !selectedCategory && (
           <section className="py-16">
-            <div className="flex items-center gap-4 mb-10">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+              variants={fadeInUp}
+              className="flex items-center gap-4 mb-10"
+            >
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25">
                 <span className="text-2xl">💰</span>
               </div>
               <div>
                 <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight">
-                  Storste besparelser
+                  Største besparelser
                 </h2>
                 <p className="text-[#86868b]">
-                  Her kan du spare mest ved at vaelge den rigtige butik.
+                  Her kan du spare mest ved at vælge den rigtige butik.
                 </p>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-50px' }}
+              variants={containerVariants}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+            >
               {topSavings.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onClick={() => navigate(`/product/${product.id}`)}
-                />
+                <motion.div key={product.id} variants={cardVariants}>
+                  <ProductCard
+                    product={product}
+                    onClick={() => navigate(`/product/${product.id}`)}
+                  />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </section>
         )}
 
         {/* On Sale Section */}
         {!searchQuery && !selectedCategory && productsOnSale.length > 0 && (
           <section className="py-16">
-            <div className="rounded-3xl bg-gradient-to-br from-rose-50 to-orange-50 p-8 md:p-10 border border-rose-100">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-100px' }}
+              variants={fadeInUp}
+              className="rounded-3xl bg-gradient-to-br from-rose-50 to-orange-50 p-8 md:p-10 border border-rose-100"
+            >
               <div className="flex items-center gap-4 mb-10">
                 <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center shadow-lg shadow-rose-500/25">
                   <span className="text-2xl">🏷️</span>
@@ -197,27 +320,40 @@ export function HomePage() {
                     Aktuelle tilbud
                   </h2>
                   <p className="text-[#86868b]">
-                    Produkter pa tilbud lige nu.
+                    Produkter på tilbud lige nu.
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-50px' }}
+                variants={containerVariants}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+              >
                 {productsOnSale.slice(0, 4).map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onClick={() => navigate(`/product/${product.id}`)}
-                  />
+                  <motion.div key={product.id} variants={cardVariants}>
+                    <ProductCard
+                      product={product}
+                      onClick={() => navigate(`/product/${product.id}`)}
+                    />
+                  </motion.div>
                 ))}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </section>
         )}
 
         {/* All Products */}
         <section className="py-16">
-          <div className="flex items-end justify-between mb-10">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={fadeInUp}
+            className="flex items-end justify-between mb-10"
+          >
             <div>
               <h2 className="text-3xl font-semibold text-[#1d1d1f] tracking-tight mb-1">
                 {searchQuery
@@ -239,34 +375,45 @@ export function HomePage() {
                 className="appearance-none bg-[#f5f5f7] hover:bg-[#e8e8ed] rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-[#1d1d1f] focus:outline-none focus:ring-2 focus:ring-green-500/30 cursor-pointer transition-colors"
               >
                 <option value="default">Sortering</option>
-                <option value="price-low">Pris: Lav-Hoj</option>
-                <option value="price-high">Pris: Hoj-Lav</option>
+                <option value="price-low">Pris: Lav-Høj</option>
+                <option value="price-high">Pris: Høj-Lav</option>
                 <option value="savings">Besparelse</option>
                 <option value="name">Navn</option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
             </div>
-          </div>
+          </motion.div>
 
           {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-50px' }}
+              variants={containerVariants}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5"
+            >
               {filteredProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onClick={() => navigate(`/product/${product.id}`)}
-                />
+                <motion.div key={product.id} variants={cardVariants}>
+                  <ProductCard
+                    product={product}
+                    onClick={() => navigate(`/product/${product.id}`)}
+                  />
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           ) : (
-            <div className="text-center py-24">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-24"
+            >
               <p className="text-2xl font-semibold text-[#1d1d1f] mb-2">
                 Ingen resultater
               </p>
               <p className="text-[#86868b]">
-                Prov en anden sogning eller fjern filteret.
+                Prøv en anden søgning eller fjern filteret.
               </p>
-            </div>
+            </motion.div>
           )}
         </section>
       </main>
