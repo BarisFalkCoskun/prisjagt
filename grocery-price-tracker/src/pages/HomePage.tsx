@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ChevronDown, Sparkles, ShoppingCart } from 'lucide-react';
-import { Header, ProductCard, SavingsDashboard, ShoppingList } from '../components';
+import { Header, ProductCard, SavingsDashboard, ShoppingList, MobileNav } from '../components';
 import { products, categories, searchProducts } from '../data/products';
 import { useShoppingList } from '../context';
 
@@ -445,7 +445,7 @@ export function HomePage() {
         </div>
       </footer>
 
-      {/* Floating Shopping List Button */}
+      {/* Floating Shopping List Button - Desktop only */}
       <motion.button
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -453,7 +453,7 @@ export function HomePage() {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsListOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center hidden md:flex"
       >
         <ShoppingCart className="w-6 h-6" />
         {itemCount > 0 && (
@@ -466,6 +466,17 @@ export function HomePage() {
           </motion.span>
         )}
       </motion.button>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileNav
+        onOpenSearch={() => {
+          // Focus search input
+          const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
+          if (searchInput) searchInput.focus();
+        }}
+        onOpenList={() => setIsListOpen(true)}
+        activeTab="home"
+      />
 
       {/* Shopping List Panel */}
       <ShoppingList isOpen={isListOpen} onClose={() => setIsListOpen(false)} />

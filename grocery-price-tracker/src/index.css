@@ -232,3 +232,80 @@ body {
   font-size: 12px;
   font-weight: 500;
 }
+
+/* Safe area padding for mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Mobile bottom navigation spacing */
+@media (max-width: 767px) {
+  .mobile-nav-spacing {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Dark mode support for body */
+.dark body,
+body.dark {
+  background-color: #000000;
+  color: #f5f5f7;
+}
+
+/* Smooth color transitions for dark mode */
+* {
+  transition-property: background-color, border-color;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-out;
+}
+
+/* Disable transition on motion-based animations to prevent conflicts */
+[style*="transform"] {
+  transition-property: none;
+}
+
+/* Loading skeleton shimmer */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+/* Improved focus for accessibility */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* Hide mobile nav on desktop */
+@media (min-width: 768px) {
+  .mobile-only {
+    display: none !important;
+  }
+}
