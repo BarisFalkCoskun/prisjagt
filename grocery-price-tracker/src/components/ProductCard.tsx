@@ -90,29 +90,39 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           )}
         </div>
 
-        {/* Store Price Comparison - Cleaner Design */}
-        <div className="flex gap-1">
-          {sortedPrices.map((sp, index) => (
-            <div
-              key={sp.store.id}
-              className={`flex-1 py-2 rounded-xl text-center transition-all relative overflow-hidden ${
-                index === 0
-                  ? 'bg-gradient-to-b from-emerald-50 to-green-50'
-                  : 'bg-[#f5f5f7]'
-              }`}
-            >
-              {/* Store Color Indicator */}
+        {/* Store Price Comparison - With Store Names */}
+        <div className="flex gap-1.5">
+          {sortedPrices.map((sp, index) => {
+            // Get short store name
+            const shortName = sp.store.name === 'Rema 1000' ? 'Rema' : sp.store.name;
+
+            return (
               <div
-                className="w-2 h-2 rounded-full mx-auto mb-1"
-                style={{ backgroundColor: sp.store.color }}
-              />
-              <p className={`text-xs font-bold ${
-                index === 0 ? 'text-emerald-600' : 'text-[#1d1d1f]'
-              }`}>
-                {sp.currentPrice.toFixed(0)},-
-              </p>
-            </div>
-          ))}
+                key={sp.store.id}
+                className={`flex-1 py-2 px-1 rounded-xl text-center transition-all relative overflow-hidden ${
+                  index === 0
+                    ? 'bg-gradient-to-b from-emerald-50 to-green-50 ring-1 ring-emerald-200'
+                    : 'bg-[#f5f5f7]'
+                }`}
+              >
+                {/* Store Color Bar at Top */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-1"
+                  style={{ backgroundColor: sp.store.color }}
+                />
+                {/* Store Name */}
+                <p className="text-[8px] font-semibold text-[#86868b] mt-1 mb-0.5 truncate">
+                  {shortName}
+                </p>
+                {/* Price */}
+                <p className={`text-[11px] font-bold ${
+                  index === 0 ? 'text-emerald-600' : 'text-[#1d1d1f]'
+                }`}>
+                  {sp.currentPrice.toFixed(0)},-
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </article>
