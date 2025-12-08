@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Image } from '@heroui/react';
+import { Heart } from 'lucide-react';
 import type { Product } from '../types';
 
 interface ProductCardProps {
@@ -7,12 +9,19 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, onClick }: ProductCardProps) {
+  const [isFavorite, setIsFavorite] = useState(false);
+
   const sortedPrices = [...product.storePrices].sort((a, b) => a.currentPrice - b.currentPrice);
   const lowestStorePrice = sortedPrices[0];
   const highestStorePrice = sortedPrices[sortedPrices.length - 1];
 
   const priceDiff = highestStorePrice.currentPrice - lowestStorePrice.currentPrice;
   const hasSale = product.storePrices.some(sp => sp.isOnSale);
+
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsFavorite(!isFavorite);
+  };
 
   return (
     <article
@@ -30,6 +39,18 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           className="object-contain w-full h-full transition-transform duration-500 group-hover:scale-110 relative z-10"
           fallbackSrc="https://via.placeholder.com/400x400?text=No+Image"
         />
+
+        {/* Favorite Button - Top Left */}
+        <button
+          onClick={handleFavoriteClick}
+          className={`absolute top-3 left-3 z-20 p-2 rounded-full transition-all duration-200 ${
+            isFavorite
+              ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30 scale-100'
+              : 'bg-white/80 backdrop-blur-sm text-[#86868b] opacity-0 group-hover:opacity-100 hover:bg-white hover:text-rose-500 hover:scale-110'
+          }`}
+        >
+          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+        </button>
 
         {/* Badges - Stacked in top right */}
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end z-20">
