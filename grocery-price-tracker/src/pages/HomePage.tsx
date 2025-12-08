@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { ChevronDown, Sparkles, ShoppingCart } from 'lucide-react';
-import { Header, ProductCard, SavingsDashboard, ShoppingList, MobileNav, MeshGradient, GlassSearch, useDynamicIsland } from '../components';
+import { Sparkles, ShoppingCart, ArrowUpDown, TrendingDown, DollarSign, SortAsc } from 'lucide-react';
+import { Header, ProductCard, SavingsDashboard, ShoppingList, MobileNav, GlassSearch, useDynamicIsland, ScrollProgress, SegmentedControl, GradientText, MagneticButton } from '../components';
 import { products, categories, searchProducts } from '../data/products';
 import { useShoppingList } from '../context';
 
@@ -126,6 +126,9 @@ export function HomePage() {
       {/* Dynamic Island Notifications */}
       <DynamicIsland />
 
+      {/* Scroll Progress Indicator */}
+      <ScrollProgress />
+
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
       {/* Hero Section - Apple-style with Mesh Gradient */}
@@ -203,7 +206,13 @@ export function HomePage() {
               >
                 Find de bedste priser.
                 <br />
-                <span className="text-emerald-100">Spar penge hver dag.</span>
+                <GradientText
+                  colors={['#ffffff', '#a7f3d0', '#34d399', '#a7f3d0', '#ffffff']}
+                  animationSpeed={4}
+                  className="text-5xl md:text-7xl font-semibold tracking-tight"
+                >
+                  Spar penge hver dag.
+                </GradientText>
               </motion.h1>
 
               <motion.p
@@ -421,21 +430,18 @@ export function HomePage() {
               </p>
             </div>
 
-            {/* Sort Dropdown */}
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortOption)}
-                className="appearance-none bg-[#f5f5f7] dark:bg-[#2c2c2e] hover:bg-[#e8e8ed] dark:hover:bg-[#3a3a3c] rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-[#1d1d1f] dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500/30 cursor-pointer transition-colors"
-              >
-                <option value="default">Sortering</option>
-                <option value="price-low">Pris: Lav-Høj</option>
-                <option value="price-high">Pris: Høj-Lav</option>
-                <option value="savings">Besparelse</option>
-                <option value="name">Navn</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#86868b] pointer-events-none" />
-            </div>
+            {/* Sort Control - Apple-style Segmented */}
+            <SegmentedControl
+              segments={[
+                { id: 'default', label: 'Alle', icon: <ArrowUpDown className="w-3.5 h-3.5" /> },
+                { id: 'price-low', label: 'Pris', icon: <DollarSign className="w-3.5 h-3.5" /> },
+                { id: 'savings', label: 'Spar', icon: <TrendingDown className="w-3.5 h-3.5" /> },
+                { id: 'name', label: 'A-Z', icon: <SortAsc className="w-3.5 h-3.5" /> },
+              ]}
+              value={sortBy}
+              onChange={(value) => setSortBy(value as SortOption)}
+              size="sm"
+            />
           </motion.div>
 
           {filteredProducts.length > 0 ? (
@@ -490,26 +496,29 @@ export function HomePage() {
       </footer>
 
       {/* Floating Shopping List Button - Desktop only */}
-      <motion.button
+      <motion.div
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setIsListOpen(true)}
-        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center hidden md:flex"
+        className="fixed bottom-6 right-6 z-40 hidden md:block"
       >
-        <ShoppingCart className="w-6 h-6" />
-        {itemCount > 0 && (
-          <motion.span
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center shadow-lg"
-          >
-            {itemCount > 9 ? '9+' : itemCount}
-          </motion.span>
-        )}
-      </motion.button>
+        <MagneticButton
+          onClick={() => setIsListOpen(true)}
+          strength={0.4}
+          className="relative w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center"
+        >
+          <ShoppingCart className="w-6 h-6" />
+          {itemCount > 0 && (
+            <motion.span
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center shadow-lg"
+            >
+              {itemCount > 9 ? '9+' : itemCount}
+            </motion.span>
+          )}
+        </MagneticButton>
+      </motion.div>
 
       {/* Mobile Bottom Navigation */}
       <MobileNav

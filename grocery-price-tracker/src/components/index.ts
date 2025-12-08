@@ -16,3 +16,8 @@ export { AnimatedGradient, MeshGradient } from './AnimatedGradient';
 export { GlassSearch } from './GlassSearch';
 export { BottomSheet, useBottomSheet } from './BottomSheet';
 export { Confetti, useConfetti } from './Confetti';
+export { MagneticButton } from './MagneticButton';
+export { ScrollProgress, CircularScrollProgress } from './ScrollProgress';
+export { BlurImage, ProgressiveImage } from './BlurImage';
+export { GradientText, RevealText, TypewriterText } from './GradientText';
+export { SegmentedControl, PillSelector } from './SegmentedControl';
