@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { Image } from '@heroui/react';
-import { Heart, Plus, TrendingDown, Check } from 'lucide-react';
+import { Heart, Plus, TrendingDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Product } from '../types';
 import { useShoppingList } from '../context/ShoppingListContext';
+import { TiltCard } from './TiltCard';
 
 interface ProductCardProps {
   product: Product;
@@ -152,23 +153,47 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
   // Get glow color from store
   const glowColor = lowestStorePrice.store.color;
 
-  return (
-    <motion.article
-      onClick={onClick}
-      whileHover={{ y: -8 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-      className="group cursor-pointer bg-white dark:bg-[#1d1d1f] rounded-3xl border border-[#e8e8ed] dark:border-[#38383a] overflow-hidden relative"
-      style={{
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)',
-      }}
+  // Animated checkmark SVG
+  const AnimatedCheck = () => (
+    <motion.svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      {/* Hover glow effect */}
-      <div
-        className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-        style={{
-          boxShadow: `0 8px 40px -8px ${glowColor}40, 0 0 0 1px ${glowColor}20`,
-        }}
+      <motion.path
+        d="M4 12 L9 17 L20 6"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{ duration: 0.4, ease: 'easeOut' }}
       />
+    </motion.svg>
+  );
+
+  return (
+    <TiltCard
+      onClick={onClick}
+      glowColor={`${glowColor}60`}
+      intensity={8}
+      className="group cursor-pointer"
+    >
+      <article
+        className="bg-white dark:bg-[#1d1d1f] rounded-3xl border border-[#e8e8ed] dark:border-[#38383a] overflow-hidden relative h-full"
+        style={{
+          boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)',
+        }}
+      >
+        {/* Hover glow effect */}
+        <div
+          className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{
+            boxShadow: `0 8px 40px -8px ${glowColor}40, 0 0 0 1px ${glowColor}20`,
+          }}
+        />
 
       {/* Image Container */}
       <div className="relative aspect-square bg-gradient-to-br from-[#fafafa] to-[#f0f0f2] dark:from-[#2c2c2e] dark:to-[#1d1d1f] p-8 overflow-hidden">
@@ -211,7 +236,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
                 exit={{ scale: 0.5, opacity: 0 }}
                 className="p-2.5 rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
               >
-                <Check className="w-4 h-4" />
+                <AnimatedCheck />
               </motion.div>
             ) : (
               <motion.button
@@ -323,6 +348,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           })}
         </div>
       </div>
-    </motion.article>
+      </article>
+    </TiltCard>
   );
 }

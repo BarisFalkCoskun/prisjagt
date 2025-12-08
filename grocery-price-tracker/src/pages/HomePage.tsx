@@ -1,8 +1,8 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { ChevronDown, Sparkles, ShoppingCart } from 'lucide-react';
-import { Header, ProductCard, SavingsDashboard, ShoppingList, MobileNav } from '../components';
+import { Header, ProductCard, SavingsDashboard, ShoppingList, MobileNav, MeshGradient, GlassSearch, useDynamicIsland } from '../components';
 import { products, categories, searchProducts } from '../data/products';
 import { useShoppingList } from '../context';
 
@@ -43,6 +43,14 @@ const fadeInUp = {
   }
 };
 
+// Search suggestions for GlassSearch
+const searchSuggestions = [
+  { id: '1', text: 'Mælk', type: 'trending' as const },
+  { id: '2', text: 'Smør', type: 'trending' as const },
+  { id: '3', text: 'Æg', type: 'suggestion' as const },
+  { id: '4', text: 'Ost', type: 'suggestion' as const },
+];
+
 export function HomePage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,6 +58,12 @@ export function HomePage() {
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [isListOpen, setIsListOpen] = useState(false);
   const { itemCount } = useShoppingList();
+  const { DynamicIsland } = useDynamicIsland();
+
+  // Scroll-based hero parallax
+  const { scrollY } = useScroll();
+  const heroY = useTransform(scrollY, [0, 500], [0, 150]);
+  const heroOpacity = useTransform(scrollY, [0, 300], [1, 0]);
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -109,33 +123,26 @@ export function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#fbfbfd] dark:bg-black">
+      {/* Dynamic Island Notifications */}
+      <DynamicIsland />
+
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
 
-      {/* Hero Section - Colorful but Clean */}
+      {/* Hero Section - Apple-style with Mesh Gradient */}
       {!searchQuery && !selectedCategory && (
-        <section className="pt-14">
-          <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600">
-            {/* Animated background shapes */}
+        <section className="pt-14 relative overflow-hidden">
+          <motion.div
+            style={{ y: heroY }}
+            className="relative min-h-[600px] md:min-h-[700px] bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600"
+          >
+            {/* Mesh gradient background */}
             <div className="absolute inset-0">
               <motion.div
-                className="absolute top-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"
+                className="absolute top-20 left-20 w-[500px] h-[500px] bg-white/10 rounded-full blur-[100px]"
                 animate={{
                   scale: [1, 1.2, 1],
-                  x: [0, 20, 0],
-                  y: [0, -20, 0],
-                }}
-                transition={{
-                  duration: 8,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              />
-              <motion.div
-                className="absolute bottom-10 right-20 w-80 h-80 bg-teal-400/20 rounded-full blur-3xl"
-                animate={{
-                  scale: [1.2, 1, 1.2],
-                  x: [0, -30, 0],
-                  y: [0, 30, 0],
+                  x: [0, 50, 0],
+                  y: [0, -30, 0],
                 }}
                 transition={{
                   duration: 10,
@@ -144,10 +151,11 @@ export function HomePage() {
                 }}
               />
               <motion.div
-                className="absolute top-40 right-40 w-64 h-64 bg-emerald-300/20 rounded-full blur-3xl"
+                className="absolute bottom-20 right-10 w-[400px] h-[400px] bg-teal-400/20 rounded-full blur-[80px]"
                 animate={{
-                  scale: [1, 1.3, 1],
-                  rotate: [0, 180, 360],
+                  scale: [1.2, 1, 1.2],
+                  x: [0, -40, 0],
+                  y: [0, 40, 0],
                 }}
                 transition={{
                   duration: 12,
@@ -155,19 +163,36 @@ export function HomePage() {
                   ease: 'easeInOut',
                 }}
               />
+              <motion.div
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-emerald-300/15 rounded-full blur-[120px]"
+                animate={{
+                  scale: [1, 1.3, 1],
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              />
             </div>
 
-            <div className="relative max-w-5xl mx-auto px-6 py-20 md:py-28">
+            <motion.div
+              style={{ opacity: heroOpacity }}
+              className="relative max-w-5xl mx-auto px-6 py-20 md:py-28"
+            >
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
                 className="flex items-center gap-2 mb-6"
               >
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-full">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full border border-white/30"
+                >
                   <Sparkles className="w-4 h-4 text-yellow-300" />
                   <span className="text-sm font-medium text-white">Smart prissammenligning</span>
-                </div>
+                </motion.div>
               </motion.div>
 
               <motion.h1
@@ -185,43 +210,62 @@ export function HomePage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
-                className="text-xl md:text-2xl text-emerald-50/90 max-w-2xl leading-relaxed mb-10"
+                className="text-xl md:text-2xl text-emerald-50/90 max-w-2xl leading-relaxed mb-8"
               >
                 Sammenlign priser fra Netto, Rema 1000, Bilka og Føtex.
                 Se prishistorik og find de bedste tilbud.
               </motion.p>
 
-              {/* Stats */}
+              {/* Glass Search Bar */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.5 }}
-                className="flex flex-wrap gap-6"
+                className="max-w-xl mb-12"
+              >
+                <GlassSearch
+                  value={searchQuery}
+                  onChange={setSearchQuery}
+                  onSearch={setSearchQuery}
+                  placeholder="Søg efter produkter..."
+                  suggestions={searchSuggestions}
+                />
+              </motion.div>
+
+              {/* Stats */}
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                className="flex flex-wrap gap-4"
               >
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-md rounded-2xl border border-white/25 shadow-lg"
                 >
                   <span className="text-3xl font-semibold text-white">{products.length}</span>
                   <span className="text-emerald-100">produkter</span>
                 </motion.div>
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-md rounded-2xl border border-white/25 shadow-lg"
                 >
                   <span className="text-3xl font-semibold text-white">4</span>
                   <span className="text-emerald-100">butikker</span>
                 </motion.div>
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-sm rounded-2xl border border-white/20"
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                  className="flex items-center gap-3 px-5 py-3 bg-white/15 backdrop-blur-md rounded-2xl border border-white/25 shadow-lg"
                 >
                   <span className="text-3xl font-semibold text-yellow-300">{productsOnSale.length + topSavings.length}</span>
                   <span className="text-emerald-100">tilbud</span>
                 </motion.div>
               </motion.div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </section>
       )}
 
