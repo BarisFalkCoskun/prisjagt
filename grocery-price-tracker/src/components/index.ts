@@ -4,3 +4,6 @@ export { ProductCard } from './ProductCard';
 export { StorePriceCard } from './StorePriceCard';
 export { PriceChart } from './PriceChart';
 export { PriceStats } from './PriceStats';
+export { AnimatedCounter } from './AnimatedCounter';
+export { SavingsDashboard } from './SavingsDashboard';
+export { ShoppingList } from './ShoppingList';

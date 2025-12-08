@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Image } from '@heroui/react';
-import { Heart } from 'lucide-react';
+import { Heart, Plus, TrendingDown, TrendingUp, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Product } from '../types';
+import { useShoppingList } from '../context/ShoppingListContext';
 
 interface ProductCardProps {
   product: Product;
@@ -10,6 +12,8 @@ interface ProductCardProps {
 
 export function ProductCard({ product, onClick }: ProductCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showAddedFeedback, setShowAddedFeedback] = useState(false);
+  const { addItem, isInList } = useShoppingList();
 
   const sortedPrices = [...product.storePrices].sort((a, b) => a.currentPrice - b.currentPrice);
   const lowestStorePrice = sortedPrices[0];
@@ -17,10 +21,64 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
 
   const priceDiff = highestStorePrice.currentPrice - lowestStorePrice.currentPrice;
   const hasSale = product.storePrices.some(sp => sp.isOnSale);
+  const inList = isInList(product.id);
+
+  // Simulate price change data (in real app, this would come from price history)
+  const priceChange = lowestStorePrice.priceHistory
+    ? lowestStorePrice.priceHistory[0]?.price - lowestStorePrice.currentPrice
+    : Math.random() > 0.5 ? Math.random() * 5 : -Math.random() * 3;
+  const priceChangePercent = (priceChange / (lowestStorePrice.currentPrice + priceChange)) * 100;
+  const isPriceDown = priceChange > 0;
+  const isLowestEver = Math.random() > 0.7; // Simulated - would check history
+
+  // Generate mini sparkline data
+  const sparklineData = lowestStorePrice.priceHistory?.slice(0, 7).reverse() ||
+    Array.from({ length: 7 }, () => lowestStorePrice.currentPrice + (Math.random() - 0.5) * 10);
 
   const handleFavoriteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsFavorite(!isFavorite);
+  };
+
+  const handleAddToList = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    addItem(product);
+    setShowAddedFeedback(true);
+    setTimeout(() => setShowAddedFeedback(false), 1500);
+  };
+
+  // Sparkline component
+  const Sparkline = ({ data }: { data: number[] }) => {
+    const min = Math.min(...data);
+    const max = Math.max(...data);
+    const range = max - min || 1;
+    const width = 50;
+    const height = 20;
+    const points = data.map((value, i) => {
+      const x = (i / (data.length - 1)) * width;
+      const y = height - ((value - min) / range) * height;
+      return `${x},${y}`;
+    }).join(' ');
+
+    return (
+      <svg width={width} height={height} className="overflow-visible">
+        <polyline
+          points={points}
+          fill="none"
+          stroke={isPriceDown ? '#10b981' : '#f43f5e'}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {/* End dot */}
+        <circle
+          cx={width}
+          cy={height - ((data[data.length - 1] - min) / range) * height}
+          r="2"
+          fill={isPriceDown ? '#10b981' : '#f43f5e'}
+        />
+      </svg>
+    );
   };
 
   return (
@@ -40,26 +98,86 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           fallbackSrc="https://via.placeholder.com/400x400?text=No+Image"
         />
 
-        {/* Favorite Button - Top Left */}
-        <button
-          onClick={handleFavoriteClick}
-          className={`absolute top-3 left-3 z-20 p-2 rounded-full transition-all duration-200 ${
-            isFavorite
-              ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30 scale-100'
-              : 'bg-white/80 dark:bg-[#2c2c2e]/80 backdrop-blur-sm text-[#86868b] opacity-0 group-hover:opacity-100 hover:bg-white dark:hover:bg-[#3a3a3c] hover:text-rose-500 hover:scale-110'
-          }`}
-        >
-          <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
-        </button>
+        {/* Top Left Actions */}
+        <div className="absolute top-3 left-3 z-20 flex gap-2">
+          {/* Favorite Button */}
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={handleFavoriteClick}
+            className={`p-2 rounded-full transition-all duration-200 ${
+              isFavorite
+                ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30'
+                : 'bg-white/80 dark:bg-[#2c2c2e]/80 backdrop-blur-sm text-[#86868b] opacity-0 group-hover:opacity-100 hover:bg-white dark:hover:bg-[#3a3a3c] hover:text-rose-500'
+            }`}
+          >
+            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
+          </motion.button>
+
+          {/* Add to List Button */}
+          <AnimatePresence mode="wait">
+            {showAddedFeedback ? (
+              <motion.div
+                key="added"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                className="p-2 rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30"
+              >
+                <Check className="w-4 h-4" />
+              </motion.div>
+            ) : (
+              <motion.button
+                key="add"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.5, opacity: 0 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={handleAddToList}
+                className={`p-2 rounded-full transition-all duration-200 ${
+                  inList
+                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30'
+                    : 'bg-white/80 dark:bg-[#2c2c2e]/80 backdrop-blur-sm text-[#86868b] opacity-0 group-hover:opacity-100 hover:bg-white dark:hover:bg-[#3a3a3c] hover:text-emerald-500'
+                }`}
+              >
+                <Plus className={`w-4 h-4 ${inList ? 'rotate-45' : ''}`} />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
 
         {/* Badges - Stacked in top right */}
         <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end z-20">
+          {/* Price Drop Badge */}
+          {isPriceDown && Math.abs(priceChangePercent) > 3 && (
+            <motion.span
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-bold bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-green-500/25"
+            >
+              <TrendingDown className="w-3 h-3" />
+              {Math.abs(priceChangePercent).toFixed(0)}%
+            </motion.span>
+          )}
+          {/* Price Up indicator (subtle) */}
+          {!isPriceDown && Math.abs(priceChangePercent) > 3 && (
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400">
+              <TrendingUp className="w-3 h-3" />
+              {Math.abs(priceChangePercent).toFixed(0)}%
+            </span>
+          )}
           {hasSale && (
             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-to-r from-rose-500 to-red-500 text-white shadow-lg shadow-red-500/25 uppercase tracking-wide">
               Tilbud
             </span>
           )}
-          {priceDiff > 1 && (
+          {isLowestEver && (
+            <span className="px-2 py-1 rounded-full text-[9px] font-bold bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-purple-500/25">
+              Laveste pris
+            </span>
+          )}
+          {priceDiff > 1 && !isPriceDown && (
             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-gradient-to-r from-emerald-500 to-green-500 text-white shadow-lg shadow-green-500/25">
               Spar {priceDiff.toFixed(0)} kr
             </span>
@@ -90,7 +208,7 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
           {product.name}
         </h3>
 
-        {/* Price Display */}
+        {/* Price Display with Sparkline */}
         <div className="flex items-end justify-between mb-4">
           <div>
             <p className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400 mb-0.5">Bedste pris</p>
@@ -101,14 +219,15 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
               <span className="text-sm font-medium text-[#86868b]">kr</span>
             </div>
           </div>
-          {priceDiff > 0 && (
-            <div className="text-right">
-              <p className="text-[10px] text-[#86868b] mb-0.5">Højeste</p>
-              <p className="text-sm font-semibold text-[#86868b]">
-                {highestStorePrice.currentPrice.toFixed(2).replace('.', ',')} kr
+          <div className="flex flex-col items-end gap-1">
+            {/* Sparkline */}
+            <Sparkline data={sparklineData.map(p => typeof p === 'number' ? p : p.price)} />
+            {priceDiff > 0 && (
+              <p className="text-[10px] text-[#86868b]">
+                op til {highestStorePrice.currentPrice.toFixed(0)},-
               </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Store Price Comparison - With Store Names */}

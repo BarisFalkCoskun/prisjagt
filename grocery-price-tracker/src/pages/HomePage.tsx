@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronDown, Sparkles } from 'lucide-react';
-import { Header, ProductCard } from '../components';
+import { ChevronDown, Sparkles, ShoppingCart } from 'lucide-react';
+import { Header, ProductCard, SavingsDashboard, ShoppingList } from '../components';
 import { products, categories, searchProducts } from '../data/products';
+import { useShoppingList } from '../context';
 
 type SortOption = 'default' | 'price-low' | 'price-high' | 'savings' | 'name';
 
@@ -47,6 +48,8 @@ export function HomePage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [isListOpen, setIsListOpen] = useState(false);
+  const { itemCount } = useShoppingList();
 
   const filteredProducts = useMemo(() => {
     let result = products;
@@ -259,6 +262,13 @@ export function HomePage() {
       </section>
 
       <main className="max-w-5xl mx-auto px-6 pb-24">
+        {/* Savings Dashboard */}
+        {!searchQuery && !selectedCategory && (
+          <section className="pt-8">
+            <SavingsDashboard onOpenList={() => setIsListOpen(true)} />
+          </section>
+        )}
+
         {/* Top Savings Section */}
         {!searchQuery && !selectedCategory && (
           <section className="py-16">
@@ -434,6 +444,31 @@ export function HomePage() {
           </div>
         </div>
       </footer>
+
+      {/* Floating Shopping List Button */}
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        onClick={() => setIsListOpen(true)}
+        className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center"
+      >
+        <ShoppingCart className="w-6 h-6" />
+        {itemCount > 0 && (
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center shadow-lg"
+          >
+            {itemCount > 9 ? '9+' : itemCount}
+          </motion.span>
+        )}
+      </motion.button>
+
+      {/* Shopping List Panel */}
+      <ShoppingList isOpen={isListOpen} onClose={() => setIsListOpen(false)} />
     </div>
   );
 }
