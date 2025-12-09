@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Image } from '@heroui/react';
-import { Heart, Plus, TrendingDown } from 'lucide-react';
+import { Heart, Plus, TrendingDown, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Product } from '../types';
 import { useShoppingList } from '../context/ShoppingListContext';
@@ -9,9 +9,10 @@ import { TiltCard } from './TiltCard';
 interface ProductCardProps {
   product: Product;
   onClick: () => void;
+  onQuickLook?: () => void;
 }
 
-export function ProductCard({ product, onClick }: ProductCardProps) {
+export function ProductCard({ product, onClick, onQuickLook }: ProductCardProps) {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showAddedFeedback, setShowAddedFeedback] = useState(false);
   const { addItem, isInList } = useShoppingList();
@@ -113,6 +114,11 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
     addItem(product);
     setShowAddedFeedback(true);
     setTimeout(() => setShowAddedFeedback(false), 1500);
+  };
+
+  const handleQuickLook = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onQuickLook?.();
   };
 
   // Sparkline component
@@ -256,6 +262,20 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
               </motion.button>
             )}
           </AnimatePresence>
+
+          {/* Quick Look Button */}
+          {onQuickLook && (
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={handleQuickLook}
+              className="p-2.5 rounded-full bg-white/90 dark:bg-[#2c2c2e]/90 backdrop-blur-sm text-[#86868b] opacity-0 group-hover:opacity-100 hover:text-blue-500 transition-all duration-200 shadow-lg"
+            >
+              <Eye className="w-4 h-4" />
+            </motion.button>
+          )}
         </div>
 
         {/* Badges - Max 2, smartly chosen */}

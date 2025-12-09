@@ -2,8 +2,9 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Sparkles, ShoppingCart, ArrowUpDown, TrendingDown, DollarSign, SortAsc } from 'lucide-react';
-import { Header, ProductCard, SavingsDashboard, ShoppingList, MobileNav, GlassSearch, useDynamicIsland, ScrollProgress, SegmentedControl, GradientText, MagneticButton } from '../components';
+import { Header, ProductCard, SavingsDashboard, ShoppingList, MobileNav, GlassSearch, useDynamicIsland, ScrollProgress, SegmentedControl, GradientText, MagneticButton, QuickLook, useSpotlight, MorphingHeader } from '../components';
 import { products, categories, searchProducts } from '../data/products';
+import type { Product } from '../types';
 import { useShoppingList } from '../context';
 
 type SortOption = 'default' | 'price-low' | 'price-high' | 'savings' | 'name';
@@ -57,8 +58,10 @@ export function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [isListOpen, setIsListOpen] = useState(false);
+  const [quickLookProduct, setQuickLookProduct] = useState<Product | null>(null);
   const { itemCount } = useShoppingList();
   const { DynamicIsland } = useDynamicIsland();
+  const spotlight = useSpotlight();
 
   // Scroll-based hero parallax
   const { scrollY } = useScroll();
@@ -129,7 +132,7 @@ export function HomePage() {
       {/* Scroll Progress Indicator */}
       <ScrollProgress />
 
-      <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+      <MorphingHeader onOpenSpotlight={spotlight.open} />
 
       {/* Hero Section - Apple-style with Mesh Gradient */}
       {!searchQuery && !selectedCategory && (
@@ -357,6 +360,7 @@ export function HomePage() {
                   <ProductCard
                     product={product}
                     onClick={() => navigate(`/product/${product.id}`)}
+                    onQuickLook={() => setQuickLookProduct(product)}
                   />
                 </motion.div>
               ))}
@@ -400,6 +404,7 @@ export function HomePage() {
                     <ProductCard
                       product={product}
                       onClick={() => navigate(`/product/${product.id}`)}
+                      onQuickLook={() => setQuickLookProduct(product)}
                     />
                   </motion.div>
                 ))}
@@ -457,6 +462,7 @@ export function HomePage() {
                   <ProductCard
                     product={product}
                     onClick={() => navigate(`/product/${product.id}`)}
+                    onQuickLook={() => setQuickLookProduct(product)}
                   />
                 </motion.div>
               ))}
@@ -522,17 +528,20 @@ export function HomePage() {
 
       {/* Mobile Bottom Navigation */}
       <MobileNav
-        onOpenSearch={() => {
-          // Focus search input
-          const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
-          if (searchInput) searchInput.focus();
-        }}
+        onOpenSearch={spotlight.open}
         onOpenList={() => setIsListOpen(true)}
         activeTab="home"
       />
 
       {/* Shopping List Panel */}
       <ShoppingList isOpen={isListOpen} onClose={() => setIsListOpen(false)} />
+
+      {/* Quick Look Modal */}
+      <QuickLook
+        product={quickLookProduct}
+        isOpen={!!quickLookProduct}
+        onClose={() => setQuickLookProduct(null)}
+      />
     </div>
   );
 }

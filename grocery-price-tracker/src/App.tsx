@@ -1,14 +1,19 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import { HomePage, ProductDetailPage, LoginPage, RecipesPage, RecipeDetailPage } from './pages';
-import { PageTransition } from './components';
+import { PageTransition, SpotlightSearch, useSpotlight } from './components';
 
 function App() {
   const location = useLocation();
+  const spotlight = useSpotlight();
 
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+    <>
+      {/* Global Spotlight Search - Cmd+K */}
+      <SpotlightSearch isOpen={spotlight.isOpen} onClose={spotlight.close} />
+
+      <AnimatePresence mode="wait">
+        <Routes location={location} key={location.pathname}>
         <Route
           path="/"
           element={
@@ -50,7 +55,8 @@ function App() {
           }
         />
       </Routes>
-    </AnimatePresence>
+      </AnimatePresence>
+    </>
   );
 }
 
