@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
-import { motion, useMotionValue, useTransform, AnimatePresence, PanInfo } from 'framer-motion';
+import { motion, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
+import type { PanInfo } from 'framer-motion';
 import { Heart, Plus, Trash2, Check, Eye } from 'lucide-react';
 
 interface SwipeAction {
