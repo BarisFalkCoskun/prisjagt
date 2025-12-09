@@ -222,15 +222,6 @@ export function MorphingHeader({ onOpenSpotlight }: MorphingHeaderProps) {
           </nav>
         </div>
       </div>
-
-      {/* Progress bar on scroll */}
-      <motion.div
-        className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-emerald-500 to-green-600"
-        style={{
-          width: useTransform(scrollY, [0, document.body.scrollHeight - window.innerHeight], ['0%', '100%']),
-          opacity: useTransform(scrollY, [0, 100], [0, 1]),
-        }}
-      />
     </motion.header>
   );
 }

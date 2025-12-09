@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Sparkles, ShoppingCart, ArrowUpDown, TrendingDown, DollarSign, SortAsc } from 'lucide-react';
-import { ProductCard, SavingsDashboard, ShoppingList, MobileNav, GlassSearch, useDynamicIsland, ScrollProgress, SegmentedControl, GradientText, MagneticButton, QuickLook, useSpotlight, MorphingHeader, TodayWidget } from '../components';
+import { ProductCard, SavingsDashboard, ShoppingList, MobileNav, GlassSearch, useDynamicIsland, SegmentedControl, GradientText, MagneticButton, QuickLook, SpotlightSearch, useSpotlight, MorphingHeader, TodayWidget, ScrollProgress } from '../components';
 import { products, categories, searchProducts } from '../data/products';
 import type { Product } from '../types';
 import { useShoppingList } from '../context';
@@ -129,10 +129,8 @@ export function HomePage() {
       {/* Dynamic Island Notifications */}
       <DynamicIsland />
 
-      {/* Scroll Progress Indicator */}
-      <ScrollProgress />
-
       <MorphingHeader onOpenSpotlight={spotlight.open} />
+      <ScrollProgress />
 
       {/* Hero Section - Apple-style with Mesh Gradient */}
       {!searchQuery && !selectedCategory && (
@@ -282,7 +280,7 @@ export function HomePage() {
       )}
 
       {/* Category Pills */}
-      <section className={`sticky top-14 z-40 bg-white/95 dark:bg-[#1d1d1f]/95 backdrop-blur-xl border-b border-[#d2d2d7]/50 dark:border-[#38383a]/50 shadow-sm ${searchQuery || selectedCategory ? 'pt-14' : ''}`}>
+      <section className={`sticky top-12 z-40 bg-white/95 dark:bg-[#1d1d1f]/95 backdrop-blur-xl border-b border-[#d2d2d7]/50 dark:border-[#38383a]/50 ${searchQuery || selectedCategory ? 'pt-14' : ''}`}>
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex gap-2 py-4 overflow-x-auto scrollbar-hide">
             <motion.button
@@ -556,6 +554,12 @@ export function HomePage() {
         product={quickLookProduct}
         isOpen={!!quickLookProduct}
         onClose={() => setQuickLookProduct(null)}
+      />
+
+      {/* Spotlight Search Modal */}
+      <SpotlightSearch
+        isOpen={spotlight.isOpen}
+        onClose={spotlight.close}
       />
     </div>
   );

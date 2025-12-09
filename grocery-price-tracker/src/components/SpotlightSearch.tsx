@@ -158,7 +158,7 @@ export function SpotlightSearch({ isOpen, onClose }: SpotlightSearchProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed top-[15%] left-1/2 -translate-x-1/2 z-[101] w-full max-w-2xl mx-4"
+            className="fixed top-[15%] inset-x-0 z-[101] w-full max-w-2xl mx-auto px-4"
           >
             <div className="bg-white/95 dark:bg-[#1d1d1f]/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#e8e8ed]/50 dark:border-[#38383a]/50 overflow-hidden">
               {/* Search Input */}
