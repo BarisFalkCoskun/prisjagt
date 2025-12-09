@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Sparkles, ShoppingCart, ArrowUpDown, TrendingDown, DollarSign, SortAsc } from 'lucide-react';
-import { Header, ProductCard, SavingsDashboard, ShoppingList, MobileNav, GlassSearch, useDynamicIsland, ScrollProgress, SegmentedControl, GradientText, MagneticButton, QuickLook, useSpotlight, MorphingHeader } from '../components';
+import { ProductCard, SavingsDashboard, ShoppingList, MobileNav, GlassSearch, useDynamicIsland, ScrollProgress, SegmentedControl, GradientText, MagneticButton, QuickLook, useSpotlight, MorphingHeader, TodayWidget } from '../components';
 import { products, categories, searchProducts } from '../data/products';
 import type { Product } from '../types';
 import { useShoppingList } from '../context';
@@ -19,7 +19,7 @@ const containerVariants = {
       delayChildren: 0.1
     }
   }
-};
+} as const;
 
 const cardVariants = {
   hidden: { opacity: 0, y: 30, scale: 0.95 },
@@ -28,7 +28,7 @@ const cardVariants = {
     y: 0,
     scale: 1,
     transition: {
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 100,
       damping: 15
     }
@@ -40,7 +40,7 @@ const fadeInUp = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, ease: 'easeOut' }
+    transition: { duration: 0.5, ease: 'easeOut' as const }
   }
 };
 
@@ -211,7 +211,7 @@ export function HomePage() {
                 <br />
                 <GradientText
                   colors={['#ffffff', '#a7f3d0', '#34d399', '#a7f3d0', '#ffffff']}
-                  animationSpeed={4}
+                  duration={4}
                   className="text-5xl md:text-7xl font-semibold tracking-tight"
                 >
                   Spar penge hver dag.
@@ -316,6 +316,21 @@ export function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Today's Deals Widget - App Store Style */}
+      {!searchQuery && !selectedCategory && (
+        <div className="bg-white dark:bg-[#1d1d1f]">
+          <div className="max-w-5xl mx-auto">
+            <TodayWidget
+              title="Dagens tilbud"
+              subtitle="De bedste priser lige nu"
+              products={topSavings}
+              variant="deals"
+              onProductClick={(product) => navigate(`/product/${product.id}`)}
+            />
+          </div>
+        </div>
+      )}
 
       <main className="max-w-5xl mx-auto px-6 pb-24">
         {/* Savings Dashboard */}
