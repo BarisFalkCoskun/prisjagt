@@ -180,16 +180,18 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
-    background: var(--color-bg);
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-full);
     transition: all 0.25s var(--ease-out-expo);
+    box-shadow: var(--shadow-xs);
   }
 
   .pill:hover .pill-content {
-    background: var(--color-surface-hover);
+    background: var(--color-surface);
     border-color: var(--color-border-strong);
     color: var(--color-text);
+    box-shadow: var(--shadow-sm);
   }
 
   .pill.active .pill-content {

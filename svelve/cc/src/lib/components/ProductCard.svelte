@@ -110,6 +110,12 @@
     transform: translateY(16px);
     animation: cardIn 0.4s ease var(--delay) forwards;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  :global(.dark) .product-card {
+    border-color: transparent;
   }
 
   @keyframes cardIn {
@@ -122,6 +128,11 @@
   .product-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    border-color: var(--color-border-strong);
+  }
+
+  :global(.dark) .product-card:hover {
+    border-color: transparent;
   }
 
   /* Store indicator - subtle colored line at top */

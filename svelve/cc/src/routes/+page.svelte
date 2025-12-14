@@ -350,8 +350,12 @@
   /* ===== STORES SECTION ===== */
   .stores-section {
     padding: var(--space-8) 0;
-    background: var(--color-surface);
+    background: var(--color-bg-tertiary);
     border-bottom: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .stores-section {
+    background: var(--color-surface);
   }
 
   .stores-header {
@@ -380,7 +384,7 @@
     align-items: center;
     gap: var(--space-2);
     padding: var(--space-2) var(--space-4);
-    background: var(--color-bg);
+    background: var(--color-surface);
     border-radius: var(--radius-full);
     font-size: var(--text-sm);
     font-weight: 500;
@@ -388,7 +392,8 @@
     opacity: 0;
     animation: fadeIn 0.4s ease var(--delay) forwards;
     cursor: pointer;
-    border: 2px solid transparent;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
   }
 
   .store-badge:hover {
@@ -401,6 +406,7 @@
     background: var(--store-color);
     color: white;
     border-color: var(--store-color);
+    box-shadow: var(--shadow-md);
   }
 
   .store-badge.active .store-initial {
@@ -447,11 +453,15 @@
   /* ===== CATEGORIES SECTION ===== */
   .categories-section {
     padding: var(--space-4) 0;
-    background: var(--color-surface);
+    background: var(--color-bg-secondary);
     border-bottom: 1px solid var(--color-border);
     position: sticky;
     top: var(--header-height);
     z-index: calc(var(--z-sticky) - 1);
+  }
+
+  :global(.dark) .categories-section {
+    background: var(--color-surface);
   }
 
   /* ===== PRODUCTS SECTION ===== */
