@@ -1,0 +1,13 @@
+{
+	"/": [
+		"src/routes/+page.server.ts"
+	],
+	"/api/products": [
+		"src/routes/api/products/+server.ts"
+	],
+	"/product/[id]": [
+		"src/routes/product/[id]/+page.server.ts"
+	],
+	"/savings": [],
+	"/stores": []
+}
