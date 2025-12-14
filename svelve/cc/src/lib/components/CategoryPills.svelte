@@ -152,23 +152,9 @@
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Sliding indicator background */
+  /* Sliding indicator - hidden, using direct styling instead */
   .pill-indicator {
-    position: absolute;
-    top: var(--space-2);
-    left: var(--indicator-left, 0);
-    width: var(--indicator-width, 0);
-    height: calc(100% - var(--space-4));
-    background: var(--gradient-accent);
-    border-radius: var(--radius-full);
-    box-shadow: 0 4px 12px rgba(0, 200, 83, 0.25);
-    transition: all 0.35s var(--ease-out-expo);
-    opacity: 0;
-    z-index: 0;
-  }
-
-  .pill-indicator.visible {
-    opacity: 1;
+    display: none;
   }
 
   .pill {
@@ -207,14 +193,14 @@
   }
 
   .pill.active .pill-content {
-    background: transparent;
+    background: var(--gradient-accent);
     border-color: transparent;
     color: white;
-    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(0, 200, 83, 0.25);
   }
 
   .pill.active:hover .pill-content {
-    background: transparent;
+    background: var(--gradient-accent);
     border-color: transparent;
   }
 
@@ -300,6 +286,10 @@
 
     .all-pill .pill-content {
       padding-left: var(--space-4);
+    }
+
+    .pill-indicator {
+      height: 44px;
     }
   }
 </style>

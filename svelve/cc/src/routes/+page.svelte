@@ -211,7 +211,7 @@
   /* ===== HERO SECTION ===== */
   .hero {
     position: relative;
-    padding: calc(var(--header-height) + 60px) 0 60px;
+    padding: calc(var(--header-height) + 32px) 0 48px;
   }
 
   .hero-bg {
@@ -597,7 +597,7 @@
   /* ===== RESPONSIVE ===== */
   @media (max-width: 768px) {
     .hero {
-      padding: calc(var(--header-height) + 40px) 0 40px;
+      padding: calc(var(--header-height) + 24px) 0 32px;
     }
 
     .hero-title {

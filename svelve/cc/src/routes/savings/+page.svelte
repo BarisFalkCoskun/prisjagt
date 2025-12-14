@@ -19,13 +19,13 @@
 <div class="savings-page">
   <div class="container">
     <header class="page-header">
-      <h1 class="page-title animate-fade-in">Dine besparelser</h1>
-      <p class="page-subtitle animate-fade-in">
+      <h1 class="page-title">Dine besparelser</h1>
+      <p class="page-subtitle">
         Se hvor meget du kan spare ved at sammenligne priser
       </p>
     </header>
 
-    <div class="savings-overview animate-scale-in">
+    <div class="savings-overview">
       <div class="savings-card main">
         <span class="label">Potentielle besparelser</span>
         <span class="value">{totalSavings} kr</span>
@@ -45,7 +45,7 @@
       <h2>Besparelser over tid</h2>
       <div class="bar-chart">
         {#each mockSavings as month, index}
-          <div class="bar-item animate-slide-up" style="animation-delay: {index * 100}ms">
+          <div class="bar-item" style="--delay: {index * 100}ms">
             <div class="bar-container">
               <div
                 class="bar"
@@ -85,24 +85,23 @@
 
 <style>
   .savings-page {
-    padding-bottom: var(--space-3xl);
+    padding: calc(var(--header-height) + var(--space-8)) 0 var(--space-16);
   }
 
   .page-header {
     text-align: center;
-    margin-bottom: var(--space-3xl);
-    padding-top: var(--space-xl);
+    margin-bottom: var(--space-10);
   }
 
   .page-title {
-    font-size: clamp(2rem, 4vw, 3rem);
+    font-size: clamp(2rem, 4vw, 2.5rem);
     font-weight: 700;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-3);
     letter-spacing: -0.02em;
   }
 
   .page-subtitle {
-    font-size: 1.125rem;
+    font-size: var(--text-md);
     color: var(--color-text-secondary);
     max-width: 500px;
     margin: 0 auto;
@@ -111,65 +110,67 @@
   .savings-overview {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
-    gap: var(--space-md);
-    margin-bottom: var(--space-3xl);
+    gap: var(--space-4);
+    margin-bottom: var(--space-10);
   }
 
   .savings-card {
     background: var(--color-surface);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
-    box-shadow: var(--shadow-sm);
+    gap: var(--space-1);
+    border: 1px solid var(--color-border);
   }
 
   .savings-card.main {
     background: linear-gradient(135deg, #00C853, #00BFA5);
     color: white;
+    border: none;
   }
 
   .savings-card .label {
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
     opacity: 0.8;
   }
 
   .savings-card .value {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 5vw, 2.5rem);
     font-weight: 700;
     line-height: 1;
+    letter-spacing: -0.02em;
   }
 
   .savings-card.main .value {
-    font-size: 3rem;
+    font-size: clamp(2.5rem, 6vw, 3.5rem);
   }
 
   .savings-card .period {
-    font-size: 0.8125rem;
+    font-size: var(--text-xs);
     opacity: 0.7;
-    margin-top: var(--space-sm);
+    margin-top: var(--space-2);
   }
 
   .chart-section {
-    margin-bottom: var(--space-3xl);
+    margin-bottom: var(--space-10);
   }
 
   .chart-section h2 {
-    font-size: 1.5rem;
+    font-size: var(--text-xl);
     font-weight: 600;
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-5);
   }
 
   .bar-chart {
     display: flex;
     align-items: flex-end;
-    gap: var(--space-md);
-    height: 300px;
+    gap: var(--space-4);
+    height: 280px;
     background: var(--color-surface);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
   }
 
   .bar-item {
@@ -178,8 +179,6 @@
     flex-direction: column;
     align-items: center;
     height: 100%;
-    opacity: 0;
-    animation-fill-mode: forwards;
   }
 
   .bar-container {
@@ -194,7 +193,7 @@
     width: 100%;
     max-width: 60px;
     background: linear-gradient(180deg, #00C853, #00BFA5);
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     position: relative;
     min-height: 20px;
     transition: height 0.6s ease-out;
@@ -205,60 +204,60 @@
     top: -28px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.75rem;
+    font-size: var(--text-xs);
     font-weight: 600;
     color: var(--color-text);
     white-space: nowrap;
   }
 
   .bar-label {
-    margin-top: var(--space-sm);
-    font-size: 0.8125rem;
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
     color: var(--color-text-secondary);
     font-weight: 500;
   }
 
   .tips-section h2 {
-    font-size: 1.5rem;
+    font-size: var(--text-xl);
     font-weight: 600;
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-5);
   }
 
   .tips-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: var(--space-lg);
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
   }
 
   .tip-card {
     background: var(--color-surface);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
   }
 
   .tip-number {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     background: linear-gradient(135deg, rgba(0, 200, 83, 0.15), rgba(0, 191, 165, 0.15));
     color: #00C853;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: var(--text-md);
     font-weight: 700;
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-4);
   }
 
   .tip-card h3 {
-    font-size: 1.125rem;
+    font-size: var(--text-md);
     font-weight: 600;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-2);
   }
 
   .tip-card p {
-    font-size: 0.9375rem;
+    font-size: var(--text-sm);
     color: var(--color-text-secondary);
     line-height: 1.6;
   }
@@ -268,8 +267,13 @@
       grid-template-columns: 1fr;
     }
 
+    .tips-grid {
+      grid-template-columns: 1fr;
+    }
+
     .bar-chart {
-      height: 250px;
+      height: 240px;
+      gap: var(--space-2);
     }
   }
 </style>
