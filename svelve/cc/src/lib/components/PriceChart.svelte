@@ -23,21 +23,24 @@
   onMount(async () => {
     const Chart = (await import('chart.js/auto')).default;
 
-    // Check for dark mode
-    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Check for dark mode using the .dark class
+    isDark = document.documentElement.classList.contains('dark');
 
-    // Listen for theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleThemeChange = (e: MediaQueryListEvent) => {
-      isDark = e.matches;
-      updateChartColors();
-    };
-    mediaQuery.addEventListener('change', handleThemeChange);
+    // Listen for theme changes via mutation observer
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          isDark = document.documentElement.classList.contains('dark');
+          updateChartColors();
+        }
+      });
+    });
+    observer.observe(document.documentElement, { attributes: true });
 
     // Process data for chart
     const sortedData = [...data].sort((a, b) => a.date.localeCompare(b.date));
     const labels = sortedData.map(d => d.date);
-    const prices = sortedData.map(d => d.price / 100); // Convert from øre to kr
+    const prices = sortedData.map(d => d.price); // Already in kroner
 
     const gradient = canvas.getContext('2d')?.createLinearGradient(0, 0, 0, height);
     gradient?.addColorStop(0, 'rgba(0, 200, 83, 0.25)');
@@ -160,7 +163,7 @@
     }
 
     return () => {
-      mediaQuery.removeEventListener('change', handleThemeChange);
+      observer.disconnect();
       chart?.destroy();
     };
   });
@@ -169,7 +172,7 @@
     if (chart && data) {
       const sortedData = [...data].sort((a, b) => a.date.localeCompare(b.date));
       chart.data.labels = sortedData.map((d: PriceHistory) => d.date);
-      chart.data.datasets[0].data = sortedData.map((d: PriceHistory) => d.price / 100);
+      chart.data.datasets[0].data = sortedData.map((d: PriceHistory) => d.price); // Already in kroner
       chart.update();
     }
   });
@@ -196,6 +199,11 @@
     background: var(--color-surface);
     border-radius: var(--radius-lg);
     padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .chart-container {
+    border-color: transparent;
   }
 
   canvas {

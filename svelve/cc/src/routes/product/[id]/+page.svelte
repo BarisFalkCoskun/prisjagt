@@ -707,6 +707,11 @@
     justify-content: center;
     box-shadow: var(--shadow-lg);
     transition: all 0.4s var(--ease-out-expo);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .main-image {
+    border-color: transparent;
   }
 
   .main-image:hover {
@@ -827,6 +832,23 @@
     font-size: var(--text-sm);
     font-weight: 600;
     color: var(--color-text-secondary);
+  }
+
+  :global(.dark) .thumb-more {
+    border-color: transparent;
+  }
+
+  :global(.dark) .thumb {
+    background: var(--color-surface);
+    border-color: transparent;
+  }
+
+  :global(.dark) .thumb:hover {
+    border-color: var(--color-border-strong);
+  }
+
+  :global(.dark) .thumb.active {
+    border-color: var(--color-accent);
   }
 
   /* ===== PRODUCT INFO ===== */
@@ -1075,6 +1097,11 @@
     background: var(--color-surface);
     border-radius: var(--radius-xl);
     padding: var(--space-5);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .description {
+    border-color: transparent;
   }
 
   .description h3 {
@@ -1111,6 +1138,11 @@
     background: var(--color-surface);
     border-radius: var(--radius-full);
     font-size: var(--text-sm);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .meta-chip {
+    border-color: transparent;
   }
 
   .chip-label {
@@ -1166,6 +1198,11 @@
     background: var(--color-surface);
     padding: var(--space-2) var(--space-4);
     border-radius: var(--radius-full);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .section-count {
+    border-color: transparent;
   }
 
   .store-list {
@@ -1180,6 +1217,11 @@
     background: var(--color-surface);
     border-radius: var(--radius-xl);
     color: var(--color-text-tertiary);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .empty-card {
+    border-color: transparent;
   }
 
   .empty-card svg {
@@ -1192,6 +1234,11 @@
     background: var(--color-surface);
     padding: 4px;
     border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .time-pills {
+    border-color: transparent;
   }
 
   .time-pill {
@@ -1230,6 +1277,11 @@
     background: var(--color-surface);
     border-radius: var(--radius-xl);
     padding: var(--space-5);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .stat-item {
+    border-color: transparent;
   }
 
   .stat-icon-wrap {
@@ -1290,6 +1342,10 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-2xl);
     padding: var(--space-8);
+  }
+
+  :global(.dark) .alert-cta {
+    border-color: transparent;
   }
 
   .alert-visual {

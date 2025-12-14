@@ -6,7 +6,27 @@ import type { PriceHistory } from '$lib/types';
 
 export const load = async ({ params, url }: Parameters<PageServerLoad>[0]) => {
   const { id } = params;
-  const sourceStore = url.searchParams.get('store') || 'rema1000';
+
+  // Parse composite ID format: storeId_productId (e.g., "rema1000_5f8a...")
+  let sourceStore: string;
+  let productId: string;
+
+  const idParts = id.split('_');
+  if (idParts.length >= 2) {
+    // Check if first part is a valid store ID
+    const potentialStoreId = idParts[0];
+    const isValidStore = STORES.some(s => s.id === potentialStoreId);
+    if (isValidStore) {
+      sourceStore = potentialStoreId;
+      productId = idParts.slice(1).join('_'); // Rejoin in case product ID contains underscores
+    } else {
+      sourceStore = url.searchParams.get('store') || 'rema1000';
+      productId = id;
+    }
+  } else {
+    sourceStore = url.searchParams.get('store') || 'rema1000';
+    productId = id;
+  }
 
   try {
     // Find the source store config
@@ -18,8 +38,8 @@ export const load = async ({ params, url }: Parameters<PageServerLoad>[0]) => {
 
     // Try to find by ObjectId first, then by other identifiers
     try {
-      if (ObjectId.isValid(id)) {
-        product = await sourceDb.collection('products').findOne({ _id: new ObjectId(id) });
+      if (ObjectId.isValid(productId)) {
+        product = await sourceDb.collection('products').findOne({ _id: new ObjectId(productId) });
       }
     } catch {
       // Not a valid ObjectId, continue
@@ -30,23 +50,23 @@ export const load = async ({ params, url }: Parameters<PageServerLoad>[0]) => {
       if (sourceStoreConfig.schema === 'rema') {
         product = await sourceDb.collection('products').findOne({
           $or: [
-            { id: parseInt(id) || -1 },
-            { bar_codes: id }
+            { id: parseInt(productId) || -1 },
+            { bar_codes: productId }
           ]
         });
       } else if (sourceStoreConfig.schema === 'dagrofa') {
         product = await sourceDb.collection('products').findOne({
           $or: [
-            { sku: id },
-            { id: parseInt(id) || -1 }
+            { sku: productId },
+            { id: parseInt(productId) || -1 }
           ]
         });
       } else {
         product = await sourceDb.collection('products').findOne({
           $or: [
-            { article: id },
-            { gtin: id },
-            { id: parseInt(id) || -1 }
+            { article: productId },
+            { gtin: productId },
+            { id: parseInt(productId) || -1 }
           ]
         });
       }

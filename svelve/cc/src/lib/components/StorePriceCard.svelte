@@ -168,10 +168,18 @@
     transition: all 0.3s var(--ease-out-expo);
   }
 
+  :global(.dark) .card-content {
+    border-color: transparent;
+  }
+
   .store-card:hover .card-content {
     border-color: var(--color-border-strong);
     transform: translateX(4px);
     box-shadow: var(--shadow-lg);
+  }
+
+  :global(.dark) .store-card:hover .card-content {
+    border-color: var(--color-border-strong);
   }
 
   .store-card.lowest .card-content {
@@ -197,6 +205,11 @@
     justify-content: center;
     background: var(--color-bg);
     border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+  }
+
+  :global(.dark) .rank {
+    border-color: transparent;
   }
 
   .rank-number {
