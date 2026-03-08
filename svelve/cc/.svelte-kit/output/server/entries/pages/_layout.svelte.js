@@ -1,10 +1,10 @@
 import "clsx";
-import { U as attr, V as ensure_array_like, W as attr_class, X as bind_props, Y as attr_style, Z as store_get, _ as stringify, $ as unsubscribe_stores } from "../../chunks/index2.js";
-import { g as getContext, e as escape_html } from "../../chunks/context.js";
+import { g as getContext, a as attr, e as ensure_array_like, b as attr_class, c as escape_html, d as bind_props, f as attr_style, s as store_get, h as stringify, u as unsubscribe_stores } from "../../chunks/index2.js";
 import "@sveltejs/kit/internal";
 import "../../chunks/exports.js";
 import "../../chunks/utils.js";
 import "@sveltejs/kit/internal/server";
+import "../../chunks/root.js";
 import "../../chunks/state.svelte.js";
 const getStores = () => {
   const stores$1 = getContext("__svelte__");
@@ -40,57 +40,53 @@ function SpotlightSearch($$renderer, $$props) {
       return `${whole},${String(fraction).padStart(2, "0")} kr`;
     }
     if (open) {
-      $$renderer2.push("<!--[-->");
+      $$renderer2.push("<!--[0-->");
       $$renderer2.push(`<div class="spotlight-overlay svelte-kcwhog"><div class="spotlight-container animate-scale-in svelte-kcwhog"><div class="search-header svelte-kcwhog"><div class="search-icon svelte-kcwhog"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17.5 17.5L13.875 13.875M15.8333 9.16667C15.8333 12.8486 12.8486 15.8333 9.16667 15.8333C5.48477 15.8333 2.5 12.8486 2.5 9.16667C2.5 5.48477 5.48477 2.5 9.16667 2.5C12.8486 2.5 15.8333 5.48477 15.8333 9.16667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div> <input${attr("value", query)} type="text" placeholder="Søg efter produkter..." class="search-input svelte-kcwhog"/> `);
       {
-        $$renderer2.push("<!--[!-->");
+        $$renderer2.push("<!--[-1-->");
         $$renderer2.push(`<kbd class="keyboard-shortcut svelte-kcwhog">ESC</kbd>`);
       }
       $$renderer2.push(`<!--]--></div> <div class="search-body svelte-kcwhog">`);
       if (results.length > 0) {
-        $$renderer2.push("<!--[-->");
+        $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<div class="results-section"><div class="section-label svelte-kcwhog">Produkter</div> <div class="results-list svelte-kcwhog"><!--[-->`);
         const each_array = ensure_array_like(results);
         for (let index = 0, $$length = each_array.length; index < $$length; index++) {
           let product = each_array[index];
           $$renderer2.push(`<button${attr_class("result-item svelte-kcwhog", void 0, { "selected": index === selectedIndex })}><div class="result-image svelte-kcwhog">`);
           if (product.images?.[0]) {
-            $$renderer2.push("<!--[-->");
+            $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<img${attr("src", product.images[0])} alt="" class="svelte-kcwhog"/>`);
           } else {
-            $$renderer2.push("<!--[!-->");
+            $$renderer2.push("<!--[-1-->");
             $$renderer2.push(`<div class="image-placeholder svelte-kcwhog"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"></rect><circle cx="7" cy="7" r="1.5" stroke="currentColor" stroke-width="1.5"></circle><path d="M2 14L7 9L11 13L18 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>`);
           }
           $$renderer2.push(`<!--]--></div> <div class="result-info svelte-kcwhog"><span class="result-name svelte-kcwhog">${escape_html(product.name)}</span> `);
           if (product.brand) {
-            $$renderer2.push("<!--[-->");
+            $$renderer2.push("<!--[0-->");
             $$renderer2.push(`<span class="result-brand svelte-kcwhog">${escape_html(product.brand)}</span>`);
           } else {
-            $$renderer2.push("<!--[!-->");
+            $$renderer2.push("<!--[-1-->");
           }
           $$renderer2.push(`<!--]--></div> <div class="result-price svelte-kcwhog">${escape_html(formatPrice(product.price || 0))}</div> <div class="result-arrow svelte-kcwhog"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 12L10 8L6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></button>`);
         }
         $$renderer2.push(`<!--]--></div></div>`);
+      } else if (query.length >= 2 && true) {
+        $$renderer2.push("<!--[1-->");
+        $$renderer2.push(`<div class="empty-results svelte-kcwhog"><div class="empty-icon svelte-kcwhog"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="22" cy="22" r="14" stroke="currentColor" stroke-width="2"></circle><path d="M32 32L42 42" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M16 22H28" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></div> <p>Ingen produkter fundet for "${escape_html(query)}"</p></div>`);
       } else {
-        $$renderer2.push("<!--[!-->");
-        if (query.length >= 2 && true) {
-          $$renderer2.push("<!--[-->");
-          $$renderer2.push(`<div class="empty-results svelte-kcwhog"><div class="empty-icon svelte-kcwhog"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="22" cy="22" r="14" stroke="currentColor" stroke-width="2"></circle><path d="M32 32L42 42" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path><path d="M16 22H28" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg></div> <p>Ingen produkter fundet for "${escape_html(query)}"</p></div>`);
-        } else {
-          $$renderer2.push("<!--[!-->");
-          $$renderer2.push(`<div class="suggestions"><div class="section-label svelte-kcwhog">Seneste søgninger</div> <div class="suggestions-list svelte-kcwhog"><!--[-->`);
-          const each_array_1 = ensure_array_like(recentSearches);
-          for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
-            let search = each_array_1[$$index_1];
-            $$renderer2.push(`<button class="suggestion-item svelte-kcwhog"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5"></path><path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg> <span>${escape_html(search)}</span></button>`);
-          }
-          $$renderer2.push(`<!--]--></div> <div class="section-label svelte-kcwhog" style="margin-top: var(--space-4)">Populære kategorier</div> <div class="category-pills svelte-kcwhog"><a href="/?category=Frugt%20%26%20gr%C3%B8nt" class="category-pill svelte-kcwhog"><span class="pill-icon svelte-kcwhog">🥬</span> <span>Frugt &amp; grønt</span></a> <a href="/?category=Mejeri%20%26%20k%C3%B8l" class="category-pill svelte-kcwhog"><span class="pill-icon svelte-kcwhog">🥛</span> <span>Mejeri &amp; køl</span></a> <a href="/?category=Frost" class="category-pill svelte-kcwhog"><span class="pill-icon svelte-kcwhog">❄️</span> <span>Frost</span></a></div></div>`);
+        $$renderer2.push("<!--[-1-->");
+        $$renderer2.push(`<div class="suggestions"><div class="section-label svelte-kcwhog">Seneste søgninger</div> <div class="suggestions-list svelte-kcwhog"><!--[-->`);
+        const each_array_1 = ensure_array_like(recentSearches);
+        for (let $$index_1 = 0, $$length = each_array_1.length; $$index_1 < $$length; $$index_1++) {
+          let search = each_array_1[$$index_1];
+          $$renderer2.push(`<button class="suggestion-item svelte-kcwhog"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="currentColor" stroke-width="1.5"></path><path d="M8 5V8L10 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg> <span>${escape_html(search)}</span></button>`);
         }
-        $$renderer2.push(`<!--]-->`);
+        $$renderer2.push(`<!--]--></div> <div class="section-label svelte-kcwhog" style="margin-top: var(--space-4)">Populære kategorier</div> <div class="category-pills svelte-kcwhog"><a href="/?category=Frugt%20%26%20gr%C3%B8nt" class="category-pill svelte-kcwhog"><span class="pill-icon svelte-kcwhog">🥬</span> <span>Frugt &amp; grønt</span></a> <a href="/?category=Mejeri%20%26%20k%C3%B8l" class="category-pill svelte-kcwhog"><span class="pill-icon svelte-kcwhog">🥛</span> <span>Mejeri &amp; køl</span></a> <a href="/?category=Frost" class="category-pill svelte-kcwhog"><span class="pill-icon svelte-kcwhog">❄️</span> <span>Frost</span></a></div></div>`);
       }
       $$renderer2.push(`<!--]--></div> <div class="search-footer svelte-kcwhog"><div class="footer-hint svelte-kcwhog"><kbd class="svelte-kcwhog">↑</kbd><kbd class="svelte-kcwhog">↓</kbd> navigér</div> <div class="footer-hint svelte-kcwhog"><kbd class="svelte-kcwhog">↵</kbd> vælg</div> <div class="footer-hint svelte-kcwhog"><kbd class="svelte-kcwhog">esc</kbd> luk</div></div></div></div>`);
     } else {
-      $$renderer2.push("<!--[!-->");
+      $$renderer2.push("<!--[-1-->");
     }
     $$renderer2.push(`<!--]-->`);
     bind_props($$props, { open });
@@ -121,12 +117,12 @@ function Header($$renderer, $$props) {
       }
       $$renderer3.push(`<!--]--> <div class="nav-indicator svelte-1elxaub"${attr_style(`--index: ${stringify(navLinks.findIndex((l) => l.href === store_get($$store_subs ??= {}, "$page", page).url.pathname))}`)}></div></div></nav> <div class="header-actions svelte-1elxaub"><button class="search-trigger svelte-1elxaub" aria-label="Søg (⌘K)"><div class="search-icon svelte-1elxaub"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.5"></circle><path d="M12.5 12.5L16 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path></svg></div> <span class="search-label svelte-1elxaub">Søg</span> <kbd class="search-kbd svelte-1elxaub">⌘K</kbd></button> <button class="theme-toggle svelte-1elxaub"${attr("aria-label", "Skift til mørk tilstand")}>`);
       {
-        $$renderer3.push("<!--[!-->");
+        $$renderer3.push("<!--[-1-->");
         $$renderer3.push(`<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>`);
       }
       $$renderer3.push(`<!--]--></button> <button${attr_class("menu-toggle svelte-1elxaub", void 0, { "open": mobileMenuOpen })}${attr("aria-label", "Åbn menu")}><span class="menu-line svelte-1elxaub"></span> <span class="menu-line svelte-1elxaub"></span></button></div></div></header> `);
       {
-        $$renderer3.push("<!--[!-->");
+        $$renderer3.push("<!--[-1-->");
       }
       $$renderer3.push(`<!--]--> `);
       SpotlightSearch($$renderer3, {
@@ -193,24 +189,16 @@ function Footer($$renderer, $$props) {
       let social = each_array[$$index];
       $$renderer2.push(`<a${attr("href", social.href)} class="social-link svelte-jz8lnl"${attr("aria-label", social.name)}>`);
       if (social.icon === "twitter") {
-        $$renderer2.push("<!--[-->");
+        $$renderer2.push("<!--[0-->");
         $$renderer2.push(`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svelte-jz8lnl"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" class="svelte-jz8lnl"></path></svg>`);
+      } else if (social.icon === "facebook") {
+        $$renderer2.push("<!--[1-->");
+        $$renderer2.push(`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svelte-jz8lnl"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" class="svelte-jz8lnl"></path></svg>`);
+      } else if (social.icon === "instagram") {
+        $$renderer2.push("<!--[2-->");
+        $$renderer2.push(`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svelte-jz8lnl"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" class="svelte-jz8lnl"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" class="svelte-jz8lnl"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" class="svelte-jz8lnl"></line></svg>`);
       } else {
-        $$renderer2.push("<!--[!-->");
-        if (social.icon === "facebook") {
-          $$renderer2.push("<!--[-->");
-          $$renderer2.push(`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svelte-jz8lnl"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" class="svelte-jz8lnl"></path></svg>`);
-        } else {
-          $$renderer2.push("<!--[!-->");
-          if (social.icon === "instagram") {
-            $$renderer2.push("<!--[-->");
-            $$renderer2.push(`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="svelte-jz8lnl"><rect x="2" y="2" width="20" height="20" rx="5" ry="5" class="svelte-jz8lnl"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" class="svelte-jz8lnl"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5" class="svelte-jz8lnl"></line></svg>`);
-          } else {
-            $$renderer2.push("<!--[!-->");
-          }
-          $$renderer2.push(`<!--]-->`);
-        }
-        $$renderer2.push(`<!--]-->`);
+        $$renderer2.push("<!--[-1-->");
       }
       $$renderer2.push(`<!--]--></a>`);
     }

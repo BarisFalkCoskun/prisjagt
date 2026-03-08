@@ -1,190 +1,100 @@
 // @ts-nocheck
 import type { PageServerLoad } from './$types';
-import { getDb, STORES, normalizeProduct, type Store } from '$lib/db';
+import { getDb, CHAINS, getAllImageUrls, extractChainPrices, type Chain } from '$lib/db';
 import { ObjectId } from 'mongodb';
 import type { PriceHistory } from '$lib/types';
 
-export const load = async ({ params, url }: Parameters<PageServerLoad>[0]) => {
+export const load = async ({ params }: Parameters<PageServerLoad>[0]) => {
   const { id } = params;
 
-  // Parse composite ID format: storeId_productId (e.g., "rema1000_5f8a...")
-  let sourceStore: string;
-  let productId: string;
-
-  const idParts = id.split('_');
-  if (idParts.length >= 2) {
-    // Check if first part is a valid store ID
-    const potentialStoreId = idParts[0];
-    const isValidStore = STORES.some(s => s.id === potentialStoreId);
-    if (isValidStore) {
-      sourceStore = potentialStoreId;
-      productId = idParts.slice(1).join('_'); // Rejoin in case product ID contains underscores
-    } else {
-      sourceStore = url.searchParams.get('store') || 'rema1000';
-      productId = id;
-    }
-  } else {
-    sourceStore = url.searchParams.get('store') || 'rema1000';
-    productId = id;
-  }
-
   try {
-    // Find the source store config
-    const sourceStoreConfig = STORES.find(s => s.id === sourceStore) || STORES[4];
+    const db = await getDb();
+    const productsCol = db.collection('final-products-dk');
+    const priceHistoryCol = db.collection('final-priceHistory-dk');
 
-    // Get product from source store
-    const sourceDb = await getDb(sourceStoreConfig.id);
+    // Find product by ObjectId
     let product: any = null;
-
-    // Try to find by ObjectId first, then by other identifiers
-    try {
-      if (ObjectId.isValid(productId)) {
-        product = await sourceDb.collection('products').findOne({ _id: new ObjectId(productId) });
-      }
-    } catch {
-      // Not a valid ObjectId, continue
-    }
-
-    // Try by SKU/article/id based on schema
-    if (!product) {
-      if (sourceStoreConfig.schema === 'rema') {
-        product = await sourceDb.collection('products').findOne({
-          $or: [
-            { id: parseInt(productId) || -1 },
-            { bar_codes: productId }
-          ]
-        });
-      } else if (sourceStoreConfig.schema === 'dagrofa') {
-        product = await sourceDb.collection('products').findOne({
-          $or: [
-            { sku: productId },
-            { id: parseInt(productId) || -1 }
-          ]
-        });
-      } else {
-        product = await sourceDb.collection('products').findOne({
-          $or: [
-            { article: productId },
-            { gtin: productId },
-            { id: parseInt(productId) || -1 }
-          ]
-        });
-      }
+    if (ObjectId.isValid(id)) {
+      product = await productsCol.findOne({ _id: new ObjectId(id) });
     }
 
     if (!product) {
       return { product: null, prices: [], priceHistory: [] };
     }
 
-    // Normalize the source product
-    const normalizedProduct = normalizeProduct(product, sourceStoreConfig.id, sourceStoreConfig.schema);
+    // Extract all chain prices
+    const chainPrices = extractChainPrices(product);
+    const images = getAllImageUrls(product);
 
-    // Collect prices from all stores
-    const prices: {
-      store: Store;
-      price: number;
-      originalPrice?: number;
-      inStock: boolean;
-      isLowest?: boolean;
-    }[] = [];
+    // Build prices array for the frontend
+    const prices = chainPrices.map((cp, i) => ({
+      store: cp.chain,
+      price: cp.price,
+      originalPrice: cp.isOnDiscount && cp.discountSaved
+        ? cp.price + cp.discountSaved
+        : undefined,
+      inStock: true,
+      isLowest: i === 0,
+      link: cp.link,
+      pricePerUnit: cp.pricePerUnit,
+      unit: cp.unit,
+    }));
 
-    // Add source store price
-    if (normalizedProduct.price > 0) {
-      prices.push({
-        store: sourceStoreConfig,
-        price: normalizedProduct.price,
-        originalPrice: normalizedProduct.originalPrice,
-        inStock: normalizedProduct.inStock ?? true
+    // Fetch real price history using barcodes
+    let priceHistory: PriceHistory[] = [];
+    if (product.barcodes && product.barcodes.length > 0) {
+      const historyDoc = await priceHistoryCol.findOne({
+        barcodes: { $in: product.barcodes },
       });
-    }
 
-    // Search for the same product in other stores
-    const searchTerms = normalizedProduct.name.split(' ').slice(0, 3).join(' ');
+      if (historyDoc && historyDoc.prices) {
+        // Convert the prices object { "2023-08-06": { "rema1000": 15 }, ... } to array
+        const entries = Object.entries(historyDoc.prices) as [string, Record<string, number>][];
+        // Sort by date
+        entries.sort(([a], [b]) => a.localeCompare(b));
 
-    for (const storeConfig of STORES) {
-      if (storeConfig.id === sourceStoreConfig.id) continue;
-
-      try {
-        const storeDb = await getDb(storeConfig.id);
-        let storeProduct: any = null;
-
-        // Try to find by GTIN/barcode first
-        if (normalizedProduct.gtin) {
-          if (storeConfig.schema === 'rema') {
-            storeProduct = await storeDb.collection('products').findOne({
-              bar_codes: normalizedProduct.gtin
-            });
-          } else if (storeConfig.schema === 'salling') {
-            storeProduct = await storeDb.collection('products').findOne({
-              gtin: normalizedProduct.gtin
+        for (const [dateStr, chainPricesObj] of entries) {
+          for (const [chainId, price] of Object.entries(chainPricesObj)) {
+            const chain = CHAINS.find(c => c.id === chainId);
+            priceHistory.push({
+              date: formatDate(dateStr),
+              price,
+              store: chain?.name || chainId,
             });
           }
         }
-
-        // If not found by GTIN, try by name similarity
-        if (!storeProduct && searchTerms.length > 3) {
-          if (storeConfig.schema === 'dagrofa') {
-            storeProduct = await storeDb.collection('products').findOne({
-              productDisplayName: { $regex: searchTerms, $options: 'i' }
-            });
-          } else {
-            storeProduct = await storeDb.collection('products').findOne({
-              name: { $regex: searchTerms, $options: 'i' }
-            });
-          }
-        }
-
-        if (storeProduct) {
-          const normalized = normalizeProduct(storeProduct, storeConfig.id, storeConfig.schema);
-          if (normalized.price > 0) {
-            prices.push({
-              store: storeConfig,
-              price: normalized.price,
-              originalPrice: normalized.originalPrice,
-              inStock: normalized.inStock ?? true
-            });
-          }
-        }
-      } catch (e) {
-        // Store might not exist or have different schema
-        console.log(`Could not fetch from ${storeConfig.id}:`, e);
       }
     }
 
-    // Sort prices - lowest first
-    prices.sort((a, b) => a.price - b.price);
+    // If no real price history, keep it empty rather than generating mock data
+    const lowestPrice = chainPrices[0]?.price || product.lowestPrice || 0;
+    const highestPrice = chainPrices.length > 0
+      ? chainPrices[chainPrices.length - 1].price
+      : lowestPrice;
 
-    // Mark lowest price
-    const pricesWithLowest = prices.map((p, i) => ({
-      ...p,
-      isLowest: i === 0
-    }));
-
-    // Generate mock price history (in a real app, this would come from historical data)
-    const priceHistory: PriceHistory[] = generateMockPriceHistory(
-      normalizedProduct.price || prices[0]?.price || 1000,
-      sourceStoreConfig.id
-    );
+    const sourceChain: Chain = chainPrices[0]?.chain || CHAINS[0];
 
     const transformedProduct = {
-      _id: normalizedProduct._id,
-      name: normalizedProduct.name,
-      description: normalizedProduct.description,
-      brand: normalizedProduct.brand,
-      images: normalizedProduct.images,
-      categories: { level1: normalizedProduct.category },
-      gtin: normalizedProduct.gtin,
-      article: normalizedProduct.sku,
-      price: normalizedProduct.price
+      _id: product._id.toString(),
+      name: product.name || '',
+      description: product.descriptions?.[0],
+      brand: product.brand,
+      images,
+      categories: { level1: product.categoryPath?.[0] },
+      categoryPath: product.categoryPath,
+      gtin: product.barcodes?.[0],
+      units: product.units,
+      unitsOfMeasure: product.unitsOfMeasure,
+      price: lowestPrice,
     };
 
     return {
       product: transformedProduct,
-      prices: pricesWithLowest,
+      prices,
       priceHistory,
-      lowestPrice: prices[0]?.price || 0,
-      highestPrice: prices[prices.length - 1]?.price || 0,
-      sourceStore: sourceStoreConfig
+      lowestPrice,
+      highestPrice,
+      sourceStore: sourceChain,
     };
   } catch (error) {
     console.error('Error loading product:', error);
@@ -192,30 +102,11 @@ export const load = async ({ params, url }: Parameters<PageServerLoad>[0]) => {
   }
 };
 
-function generateMockPriceHistory(currentPrice: number, store: string): PriceHistory[] {
-  const history: PriceHistory[] = [];
-  const now = new Date();
-
-  // Generate 30 days of price history
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-
-    // Add some realistic price variation (sales, etc.)
-    let variation = 1;
-    if (i % 7 === 0) {
-      // Weekly sale
-      variation = 0.85 + Math.random() * 0.1;
-    } else {
-      variation = 0.95 + Math.random() * 0.1;
-    }
-
-    history.push({
-      date: date.toLocaleDateString('da-DK', { day: '2-digit', month: 'short' }),
-      price: Math.round(currentPrice * variation),
-      store
-    });
+function formatDate(dateStr: string): string {
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('da-DK', { day: '2-digit', month: 'short' });
+  } catch {
+    return dateStr;
   }
-
-  return history;
 }

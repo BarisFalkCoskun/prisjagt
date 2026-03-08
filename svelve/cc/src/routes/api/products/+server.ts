@@ -1,76 +1,60 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { getDb, STORES, normalizeProduct } from '$lib/db';
+import { getDb, CHAINS, getImageUrl, extractChainPrices } from '$lib/db';
 
 export const GET: RequestHandler = async ({ url }) => {
   const query = url.searchParams.get('q') || '';
   const category = url.searchParams.get('category') || '';
-  const storeId = url.searchParams.get('store') || 'rema1000';
+  const storeId = url.searchParams.get('store') || '';
   const limit = parseInt(url.searchParams.get('limit') || '24');
   const offset = parseInt(url.searchParams.get('offset') || '0');
 
   try {
-    // Find the store config
-    const storeConfig = STORES.find(s => s.id === storeId) || STORES[4]; // Default to rema1000
+    const db = await getDb();
+    const collection = db.collection('final-products-dk');
 
-    const db = await getDb(storeConfig.id);
-    const collection = db.collection('products');
-
-    // Build filter based on store schema
+    // Build filter
     const filter: Record<string, unknown> = {};
 
     if (query) {
-      if (storeConfig.schema === 'dagrofa') {
-        filter.$or = [
-          { productDisplayName: { $regex: query, $options: 'i' } },
-          { summary: { $regex: query, $options: 'i' } }
-        ];
-      } else {
-        filter.$or = [
-          { name: { $regex: query, $options: 'i' } },
-          { description: { $regex: query, $options: 'i' } },
-          { brand: { $regex: query, $options: 'i' } }
-        ];
-      }
+      filter.$or = [
+        { name: { $regex: query, $options: 'i' } },
+        { brand: { $regex: query, $options: 'i' } },
+      ];
     }
 
     if (category) {
-      if (storeConfig.schema === 'rema') {
-        filter.category_name = { $regex: category, $options: 'i' };
-      } else if (storeConfig.schema === 'dagrofa') {
-        // Dagrofa doesn't have text categories
-      } else {
-        filter['categories.lvl0'] = { $regex: category, $options: 'i' };
-      }
+      filter.categoryPath = { $regex: category, $options: 'i' };
     }
 
-    // Ensure we have valid prices
-    if (storeConfig.schema === 'rema') {
-      filter['pricing.price'] = { $gt: 0 };
-    } else if (storeConfig.schema === 'dagrofa') {
-      filter.price = { $gt: 0 };
+    if (storeId) {
+      filter[`pricing.${storeId}.price`] = { $gt: 0 };
     }
+
+    filter.lowestPrice = { $gt: 0 };
 
     const [products, total] = await Promise.all([
       collection.find(filter).skip(offset).limit(limit).toArray(),
-      collection.countDocuments(filter)
+      collection.countDocuments(filter),
     ]);
 
-    // Normalize products
     const transformedProducts = products.map(product => {
-      const normalized = normalizeProduct(product, storeConfig.id, storeConfig.schema);
+      const prices = extractChainPrices(product);
+      const cheapest = prices[0];
+      const imageUrl = getImageUrl(product);
+
       return {
-        _id: normalized._id,
-        name: normalized.name,
-        description: normalized.description,
-        brand: normalized.brand,
-        images: normalized.images,
-        categories: { level1: normalized.category },
-        gtin: normalized.gtin,
-        article: normalized.sku,
-        price: normalized.price,
-        originalPrice: normalized.originalPrice,
-        storeId: normalized.storeId
+        _id: product._id.toString(),
+        name: product.name || '',
+        description: product.descriptions?.[0],
+        brand: product.brand,
+        images: imageUrl ? [imageUrl] : [],
+        categories: { level1: product.categoryPath?.[0] },
+        price: cheapest?.price || product.lowestPrice || 0,
+        originalPrice: cheapest?.isOnDiscount && cheapest?.discountSaved
+          ? cheapest.price + cheapest.discountSaved
+          : undefined,
+        storeId: cheapest?.chain.id || product.lowestChain?.[0] || '',
       };
     });
 
@@ -78,7 +62,6 @@ export const GET: RequestHandler = async ({ url }) => {
       products: transformedProducts,
       total,
       hasMore: offset + products.length < total,
-      store: storeConfig
     });
   } catch (error) {
     console.error('Error fetching products:', error);

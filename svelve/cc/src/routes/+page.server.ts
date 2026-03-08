@@ -1,5 +1,5 @@
 import type { PageServerLoad } from './$types';
-import { getDb, STORES, normalizeProduct, type StoreSchemaType } from '$lib/db';
+import { getDb, CHAINS, getImageUrl, extractChainPrices } from '$lib/db';
 
 interface ProductWithStore {
   _id: string;
@@ -9,11 +9,9 @@ interface ProductWithStore {
   images: string[];
   image_primary: string | null;
   category?: string;
-  gtin?: string;
   price: number;
   originalPrice?: number;
   inStock: boolean;
-  // Store info
   storeId: string;
   storeName: string;
   storeColor: string;
@@ -25,122 +23,80 @@ export const load: PageServerLoad = async ({ url }) => {
   const selectedStore = url.searchParams.get('store') || '';
 
   try {
-    // Define which stores to query
-    const storesToQuery = [
-      { id: 'rema1000', schema: 'rema' as StoreSchemaType },
-      { id: 'netto', schema: 'salling' as StoreSchemaType },
-      { id: 'bilkatogo', schema: 'salling' as StoreSchemaType },
-      { id: 'foetexplus', schema: 'salling' as StoreSchemaType },
-      { id: 'meny', schema: 'dagrofa' as StoreSchemaType },
-      { id: 'spar', schema: 'dagrofa' as StoreSchemaType },
-    ];
+    const db = await getDb();
+    const collection = db.collection('final-products-dk');
 
-    // Filter to specific store if selected
-    const filteredStores = selectedStore
-      ? storesToQuery.filter(s => s.id === selectedStore)
-      : storesToQuery;
+    // Build filter
+    const filter: Record<string, unknown> = {};
 
-    // Query all stores in parallel
-    const storeResults = await Promise.all(
-      filteredStores.map(async (store) => {
-        try {
-          const db = await getDb(store.id);
-          const collection = db.collection('products');
+    if (query) {
+      filter.$or = [
+        { name: { $regex: query, $options: 'i' } },
+        { brand: { $regex: query, $options: 'i' } },
+      ];
+    }
 
-          // Build filter based on schema
-          const filter: Record<string, unknown> = {};
+    if (category) {
+      filter.categoryPath = { $regex: category, $options: 'i' };
+    }
 
-          if (query) {
-            if (store.schema === 'dagrofa') {
-              filter.$or = [
-                { productDisplayName: { $regex: query, $options: 'i' } },
-                { summary: { $regex: query, $options: 'i' } }
-              ];
-            } else {
-              filter.$or = [
-                { name: { $regex: query, $options: 'i' } },
-                { description: { $regex: query, $options: 'i' } }
-              ];
-            }
-          }
+    if (selectedStore) {
+      // Only show products that have pricing from this chain
+      filter[`pricing.${selectedStore}.price`] = { $gt: 0 };
+    }
 
-          if (category) {
-            if (store.schema === 'rema') {
-              filter.category_name = { $regex: category, $options: 'i' };
-            }
-          }
+    // Require at least a lowestPrice > 0
+    filter.lowestPrice = { $gt: 0 };
 
-          // Add price filter
-          if (store.schema === 'rema') {
-            filter['pricing.price'] = { $gt: 0 };
-          } else if (store.schema === 'dagrofa') {
-            filter.price = { $gt: 0 };
-          }
+    const products = await collection.find(filter).limit(48).toArray();
 
-          // Get more products per store to have good variety
-          const limit = selectedStore ? 50 : Math.ceil(60 / filteredStores.length);
-          const products = await collection.find(filter).limit(limit).toArray();
-
-          return {
-            storeId: store.id,
-            schema: store.schema,
-            products
-          };
-        } catch (e) {
-          console.error(`Error querying ${store.id}:`, e);
-          return { storeId: store.id, schema: store.schema, products: [] };
-        }
-      })
-    );
-
-    // Collect all products with store info
+    // Transform to the shape the frontend expects
     const allProducts: ProductWithStore[] = [];
 
-    for (const { storeId, schema, products } of storeResults) {
-      const storeConfig = STORES.find(s => s.id === storeId);
-      if (!storeConfig) continue;
+    for (const product of products) {
+      const prices = extractChainPrices(product);
+      if (prices.length === 0) continue;
 
-      for (const product of products) {
-        const normalized = normalizeProduct(product, storeId, schema);
-
-        // Skip products with invalid prices
-        if (!normalized.price || normalized.price <= 0) continue;
-
-        allProducts.push({
-          _id: `${storeId}_${normalized._id}`,
-          name: normalized.name,
-          description: normalized.description,
-          brand: normalized.brand,
-          images: normalized.images,
-          image_primary: normalized.images[0] || null,
-          category: normalized.category,
-          gtin: normalized.gtin,
-          price: normalized.price,
-          originalPrice: normalized.originalPrice,
-          inStock: normalized.inStock ?? true,
-          storeId,
-          storeName: storeConfig.name,
-          storeColor: storeConfig.color
-        });
+      // If filtering by store, use that store's price; otherwise use the lowest
+      let displayPrice: typeof prices[0];
+      if (selectedStore) {
+        displayPrice = prices.find(p => p.chain.id === selectedStore) || prices[0];
+      } else {
+        displayPrice = prices[0]; // Already sorted lowest first
       }
+
+      const imageUrl = getImageUrl(product);
+
+      allProducts.push({
+        _id: product._id.toString(),
+        name: product.name || '',
+        description: product.descriptions?.[0],
+        brand: product.brand,
+        images: imageUrl ? [imageUrl] : [],
+        image_primary: imageUrl,
+        category: product.categoryPath?.[0],
+        price: displayPrice.price,
+        originalPrice: displayPrice.isOnDiscount && displayPrice.discountSaved
+          ? displayPrice.price + displayPrice.discountSaved
+          : undefined,
+        inStock: true,
+        storeId: displayPrice.chain.id,
+        storeName: displayPrice.chain.name,
+        storeColor: displayPrice.chain.color,
+      });
     }
 
     // Sort by price (lowest first)
     allProducts.sort((a, b) => a.price - b.price);
 
-    // Limit results
-    const limitedProducts = allProducts.slice(0, 48);
-
-    // Get categories from Rema (has good category data)
+    // Get categories from categoryPath
     let categories: { id: string; name: string; icon: string }[] = [];
     try {
-      const remaDb = await getDb('rema1000');
-      const remaCollection = remaDb.collection('products');
-      const categoriesResult = await remaCollection.aggregate([
-        { $match: { category_name: { $exists: true, $ne: null } } },
-        { $group: { _id: '$category_name' } },
+      const categoriesResult = await collection.aggregate([
+        { $match: { 'categoryPath.0': { $exists: true } } },
+        { $group: { _id: { $arrayElemAt: ['$categoryPath', 0] } } },
         { $sort: { _id: 1 } },
-        { $limit: 12 }
+        { $limit: 15 },
       ]).toArray();
 
       categories = categoriesResult
@@ -148,21 +104,21 @@ export const load: PageServerLoad = async ({ url }) => {
         .filter(Boolean)
         .map(name => ({
           id: name,
-          name: name,
-          icon: getCategoryIcon(name)
+          name,
+          icon: getCategoryIcon(name),
         }));
     } catch (e) {
       console.error('Error fetching categories:', e);
     }
 
     return {
-      products: limitedProducts,
+      products: allProducts,
       categories,
-      total: limitedProducts.length,
+      total: allProducts.length,
       query,
       selectedCategory: category,
       selectedStore,
-      stores: STORES
+      stores: CHAINS,
     };
   } catch (error) {
     console.error('Error loading products:', error);
@@ -174,7 +130,7 @@ export const load: PageServerLoad = async ({ url }) => {
       selectedCategory: category,
       selectedStore: '',
       error: 'Failed to load products',
-      stores: STORES
+      stores: CHAINS,
     };
   }
 };
@@ -207,7 +163,12 @@ function getCategoryIcon(name: string): string {
     'personlig': '🧴',
     'pleje': '💆',
     'dyrefoder': '🐕',
-    'kæledyr': '🐾'
+    'kæledyr': '🐾',
+    'mexikansk': '🌮',
+    'pasta': '🍝',
+    'ris': '🍚',
+    'kaffe': '☕',
+    'te': '🍵',
   };
 
   for (const [key, icon] of Object.entries(icons)) {

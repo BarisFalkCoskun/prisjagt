@@ -35,10 +35,12 @@
   const stores = [
     { id: 'rema1000', name: 'Rema 1000', color: '#003366' },
     { id: 'netto', name: 'Netto', color: '#FFD700' },
-    { id: 'foetexplus', name: 'Føtex+', color: '#00457C' },
-    { id: 'bilkatogo', name: 'Bilka', color: '#004B93' },
+    { id: 'foetex', name: 'Føtex', color: '#00457C' },
+    { id: 'bilka', name: 'Bilka', color: '#004B93' },
     { id: 'meny', name: 'Meny', color: '#D4002A' },
-    { id: 'spar', name: 'Spar', color: '#00843D' },
+    { id: 'nemlig', name: 'Nemlig', color: '#FF6B00' },
+    { id: 'superbrugsen', name: 'SuperBrugsen', color: '#E31937' },
+    { id: 'coop365', name: 'Coop 365', color: '#00843D' },
   ];
 </script>
 
@@ -62,7 +64,7 @@
       </h1>
 
       <p class="hero-subtitle">
-        Sammenlign priser fra 6 supermarkeder
+        Sammenlign priser fra 8 supermarkeder
       </p>
 
       <form class="hero-search" onsubmit={handleSearch}>

@@ -1,6 +1,5 @@
-import { a0 as head, V as ensure_array_like, Y as attr_style, _ as stringify } from "../../../chunks/index2.js";
-import { S as STORES } from "../../../chunks/db.js";
-import { e as escape_html } from "../../../chunks/context.js";
+import { j as head, e as ensure_array_like, f as attr_style, h as stringify, c as escape_html } from "../../../chunks/index2.js";
+import { C as CHAINS } from "../../../chunks/db.js";
 function _page($$renderer) {
   head("1r87f6r", $$renderer, ($$renderer2) => {
     $$renderer2.title(($$renderer3) => {
@@ -8,7 +7,7 @@ function _page($$renderer) {
     });
   });
   $$renderer.push(`<div class="stores-page svelte-1r87f6r"><div class="container"><header class="page-header svelte-1r87f6r"><h1 class="page-title animate-fade-in svelte-1r87f6r">Butikker</h1> <p class="page-subtitle animate-fade-in svelte-1r87f6r">Vi sammenligner priser fra de største dagligvarebutikker i Danmark</p></header> <div class="stores-grid svelte-1r87f6r"><!--[-->`);
-  const each_array = ensure_array_like(STORES);
+  const each_array = ensure_array_like(CHAINS);
   for (let index = 0, $$length = each_array.length; index < $$length; index++) {
     let store = each_array[index];
     $$renderer.push(`<div class="store-card animate-slide-up svelte-1r87f6r"${attr_style(`animation-delay: ${stringify(index * 100)}ms`)}><div class="store-logo svelte-1r87f6r"${attr_style(`background-color: ${stringify(store.color)}15`)}><span class="logo-letter svelte-1r87f6r"${attr_style(`color: ${stringify(store.color)}`)}>${escape_html(store.name.charAt(0))}</span></div> <div class="store-info svelte-1r87f6r"><h2 class="store-name svelte-1r87f6r">${escape_html(store.name)}</h2> <div class="store-stats svelte-1r87f6r"><span class="stat svelte-1r87f6r"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L10.163 5.279L15 6.031L11.5 9.418L12.326 14.279L8 12.011L3.674 14.279L4.5 9.418L1 6.031L5.837 5.279L8 1Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg> Populær</span> <span class="stat svelte-1r87f6r"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 5L6 13L2 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg> Opdateret dagligt</span></div></div> <div class="store-action svelte-1r87f6r"><span class="product-count svelte-1r87f6r">1000+ produkter</span> <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></div></div>`);

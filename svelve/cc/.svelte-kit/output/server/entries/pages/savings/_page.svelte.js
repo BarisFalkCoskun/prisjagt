@@ -1,5 +1,4 @@
-import { a0 as head, V as ensure_array_like, Y as attr_style, _ as stringify } from "../../../chunks/index2.js";
-import { e as escape_html } from "../../../chunks/context.js";
+import { j as head, c as escape_html, e as ensure_array_like, f as attr_style, h as stringify } from "../../../chunks/index2.js";
 function _page($$renderer) {
   const mockSavings = [
     { month: "Jan", amount: 127 },

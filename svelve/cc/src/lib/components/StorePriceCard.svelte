@@ -26,15 +26,14 @@
 
   // Store colors mapping
   const storeColors: Record<string, string> = {
-    netto: '#FFD700',
-    bilkatogo: '#004B93',
-    foetexplus: '#00457C',
-    fillop: '#E31937',
     rema1000: '#003366',
+    netto: '#FFD700',
+    foetex: '#00457C',
+    bilka: '#004B93',
+    nemlig: '#FF6B00',
+    superbrugsen: '#E31937',
+    coop365: '#00843D',
     meny: '#D4002A',
-    spar: '#00843D',
-    minkobmand: '#1E3A5F',
-    dagrofa: '#FF6B00',
   };
 
   const storeColor = $derived(storeColors[store.id] || '#888888');

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { STORES } from '$lib/db';
+  import { CHAINS as STORES } from '$lib/db';
 </script>
 
 <svelte:head>
